@@ -33,7 +33,7 @@ import type { RankingInfo } from "@tanstack/match-sorter-utils";
 import type { UserManagementType } from "@/types/apps/ecommerceTypes";
 
 // Component Imports
-import AddHotelDrawer from "./AddHotelDrawer";
+import AddTagsDrawer from "./AddTagsDrawer";
 import CustomAvatar from "@core/components/mui/Avatar";
 
 // Util Imports
@@ -113,7 +113,7 @@ const DebouncedInput = ({
 // Column Definitions
 const columnHelper = createColumnHelper<ECommerceOrderTypeWithAction>();
 
-const HotelsPackagesPage = ({
+const TagsBlogPage = ({
   customerData,
 }: {
   customerData?: UserManagementType[];
@@ -276,7 +276,7 @@ const HotelsPackagesPage = ({
               startIcon={<i className="ri-add-line" />}
               onClick={() => setCustomerUserOpen(!customerUserOpen)}
             >
-              Add Hotel
+              Add Facility
             </Button>
           </div>
         </CardContent>
@@ -371,7 +371,7 @@ const HotelsPackagesPage = ({
           onRowsPerPageChange={(e) => table.setPageSize(Number(e.target.value))}
         />
       </Card>
-      <AddHotelDrawer
+      <AddTagsDrawer
         open={customerUserOpen}
         handleClose={() => setCustomerUserOpen(!customerUserOpen)}
         setData={setData}
@@ -381,4 +381,4 @@ const HotelsPackagesPage = ({
   );
 };
 
-export default HotelsPackagesPage;
+export default TagsBlogPage;

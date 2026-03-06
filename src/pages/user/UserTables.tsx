@@ -30,10 +30,13 @@ import type { ColumnDef, FilterFn } from "@tanstack/react-table";
 import type { RankingInfo } from "@tanstack/match-sorter-utils";
 
 // Type Imports
-import type { UserManagementType } from "@/types/apps/ecommerceTypes";
+import type {
+  UserManagementType,
+  UsersType,
+} from "@/types/apps/ecommerceTypes";
 
 // Component Imports
-import AddHotelDrawer from "./AddHotelDrawer";
+import AddCustomerDrawer from "./AddCustomerDrawer";
 import CustomAvatar from "@core/components/mui/Avatar";
 
 // Util Imports
@@ -41,6 +44,9 @@ import { getInitials } from "@/utils/getInitials";
 
 // Style Imports
 import tableStyles from "@core/styles/table.module.css";
+import { InputLabel, Select } from "@mui/material";
+import FormControl from "@mui/material/FormControl";
+import { MenuItem } from "@mui/material";
 
 // Augment TanStack Table for fuzzy filter (table-core may be bundled)
 declare module "@tanstack/react-table" {
@@ -113,7 +119,7 @@ const DebouncedInput = ({
 // Column Definitions
 const columnHelper = createColumnHelper<ECommerceOrderTypeWithAction>();
 
-const HotelsPackagesPage = ({
+const UserTablesPage = ({
   customerData,
 }: {
   customerData?: UserManagementType[];
@@ -123,6 +129,7 @@ const HotelsPackagesPage = ({
   const [rowSelection, setRowSelection] = useState({});
   const [data, setData] = useState<UserManagementType[]>(customerData ?? []);
   const [globalFilter, setGlobalFilter] = useState("");
+  const [role, setRole] = useState<UsersType["role"]>("");
 
   const columns = useMemo(
     () =>
@@ -254,30 +261,42 @@ const HotelsPackagesPage = ({
     <>
       <Card>
         <CardContent className="flex justify-between flex-wrap max-sm:flex-col sm:items-center gap-4">
-          <DebouncedInput
-            value={globalFilter ?? ""}
-            onChange={(value) => setGlobalFilter(String(value))}
-            placeholder="Search"
+          <Button
+            variant="contained"
+            color="primary"
             className="max-sm:is-full"
-          />
+            startIcon={<i className="ri-add-line" />}
+            onClick={() => setCustomerUserOpen(!customerUserOpen)}
+          >
+            Add Customer
+          </Button>
           <div className="flex gap-4 max-sm:flex-col max-sm:is-full">
-            <Button
-              variant="outlined"
+            <DebouncedInput
+              value={globalFilter ?? ""}
+              onChange={(value) => setGlobalFilter(String(value))}
+              placeholder="Search"
               className="max-sm:is-full"
-              color="secondary"
-              startIcon={<i className="ri-upload-2-line" />}
-            >
-              Export
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              className="max-sm:is-full"
-              startIcon={<i className="ri-add-line" />}
-              onClick={() => setCustomerUserOpen(!customerUserOpen)}
-            >
-              Add Hotel
-            </Button>
+            />
+            <FormControl size="small" className="max-sm:is-full">
+              <InputLabel id="roles-app-role-select-label">
+                Select Role
+              </InputLabel>
+              <Select
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                label="Select Role"
+                id="roles-app-role-select"
+                labelId="roles-app-role-select-label"
+                className="min-is-[150px]"
+              >
+                <MenuItem value="">Select Role</MenuItem>
+                <MenuItem value="admin">Admin</MenuItem>
+                <MenuItem value="author">Author</MenuItem>
+                <MenuItem value="editor">Editor</MenuItem>
+                <MenuItem value="maintainer">Maintainer</MenuItem>
+                <MenuItem value="subscriber">Subscriber</MenuItem>
+              </Select>
+            </FormControl>
           </div>
         </CardContent>
         <div className="overflow-x-auto">
@@ -371,7 +390,7 @@ const HotelsPackagesPage = ({
           onRowsPerPageChange={(e) => table.setPageSize(Number(e.target.value))}
         />
       </Card>
-      <AddHotelDrawer
+      <AddCustomerDrawer
         open={customerUserOpen}
         handleClose={() => setCustomerUserOpen(!customerUserOpen)}
         setData={setData}
@@ -381,4 +400,4 @@ const HotelsPackagesPage = ({
   );
 };
 
-export default HotelsPackagesPage;
+export default UserTablesPage;
