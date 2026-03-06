@@ -1,19 +1,26 @@
-
-
 // MUI Imports
-import Typography from '@mui/material/Typography'
-import Box from '@mui/material/Box'
+import Grid from '@mui/material/Grid2'
+
+// Component Imports
+import ProductListTable from './ProductListTable'
+import ProductCard from './ProductCard'
+
+// Data Imports
+import { getEcommerceData } from '@/data/apps/ecommerce'
 
 const ListPackagesPage = () => {
+  // Vars
+  const data = getEcommerceData()
+
   return (
-    <Box className='flex flex-col gap-4 p-6'>
-      <Typography variant='h4' className='font-medium'>
-        List Packages
-      </Typography>
-      <Typography variant='body1' color='text.secondary'>
-        View list packages and analytics
-      </Typography>
-    </Box>
+    <Grid container spacing={6}>
+      <Grid size={{ xs: 12 }}>
+        <ProductCard />
+      </Grid>
+      <Grid size={{ xs: 12 }}>
+        <ProductListTable productData={data?.products} />
+      </Grid>
+    </Grid>
   )
 }
 
