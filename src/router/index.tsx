@@ -1,13 +1,16 @@
 import { createBrowserRouter, Outlet } from 'react-router-dom'
 import DashboardPage from '../pages/dashboard/DashboardPage'
 import StationsPage from '../pages/stations/StationsPage'
-import ReportsPage from '../pages/reports/ReportsPage'
 import SessionsPage from '../pages/sessions/SessionsPage'
 import LoginPage from '../views/Login'
 import NotFoundPage from '../views/NotFound'
 import Layout from '../components/layout/Layout'
 import BlankLayout from '../@layouts/BlankLayout'
 import Providers from '../components/Providers'
+import ListPackagesPage from '../pages/package/list/ListPackage'
+import DeparturePackagesPage from '@/pages/package/departure/DeparturePackage'
+import HotelsPackagesPage from '@/pages/package/hotels/HotelsPackage'
+import FacilityPackagesPage from '@/pages/package/Facility/FacilityPackage'
 
 // Wrapper component to provide context
 const LayoutWithProviders = () => (
@@ -42,16 +45,20 @@ export const router = createBrowserRouter([
         element: <DashboardPage />
       },
       {
-        path: 'stations',
-        element: <StationsPage />
+        path: 'package/list',
+        element: <ListPackagesPage />
       },
       {
-        path: 'reports',
-        element: <ReportsPage />
+        path: 'package/departure',
+        element: <DeparturePackagesPage />
       },
       {
-        path: 'sessions',
-        element: <SessionsPage />
+        path: 'package/hotels',
+        element: <HotelsPackagesPage />
+      },
+      {
+        path: 'package/facility',
+        element: <FacilityPackagesPage />
       }
     ]
   },

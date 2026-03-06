@@ -8,19 +8,73 @@ const verticalMenuData = (): VerticalMenuDataType[] => [
     icon: 'ri-dashboard-line'
   },
   {
-    label: 'My Station',
-    href: '/stations',
-    icon: 'ri-building-line'
+    label: 'Package',
+    icon: 'ri-box-3-line',
+    children: [
+      {
+        label: 'List',
+        href: '/package/list'
+      },
+      {
+        label: 'Departure',
+        href: '/package/departure'
+      },
+      {
+        label: 'Hotels',
+        href: '/package/hotels'
+      },
+      {
+        label: 'Facility',
+        href: '/package/facility'
+      },
+      {
+        label: 'Gallery',
+        href: '/package/gallery'
+      }
+    ]
   },
   {
-    label: 'Investment Report',
-    href: '/reports',
-    icon: 'ri-file-chart-line'
+    label: 'Blog',
+    icon: 'ri-article-line',
+    children: [
+      {
+        label: 'Categories',
+        href: '/blog/categories'
+      },
+      {
+        label: 'Post',
+        href: '/blog/post'
+      },
+      {
+        label: 'Tags',
+        href: '/blog/tags'
+      }
+    ]
   },
   {
-    label: 'Charging Sessions',
-    href: '/sessions',
-    icon: 'ri-flashlight-line'
+    label: 'Testimonials',
+    href: '/testimonials',
+    icon: 'ri-star-line'
+  },
+  {
+    label: 'Site Galleries',
+    href: '/site-galleries',
+    icon: 'ri-image-line'
+  },
+  {
+    label: 'Legal Document',
+    href: '/legal-document',
+    icon: 'ri-file-text-line'
+  },
+  {
+    label: 'Lead CRM',
+    href: '/lead-crm',
+    icon: 'ri-customer-service-line'
+  },
+  {
+    label: 'User Management',
+    href: '/user-management',
+    icon: 'ri-user-settings-line'
   }
 ]
 
