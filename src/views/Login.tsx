@@ -1,11 +1,10 @@
-
+'use client'
 
 // React Imports
 import { useState } from 'react'
 
-// React Router Imports
+// Next Imports
 import { useNavigate } from 'react-router-dom'
-
 // MUI Imports
 import Typography from '@mui/material/Typography'
 import TextField from '@mui/material/TextField'
@@ -33,7 +32,9 @@ import themeConfig from '@configs/themeConfig'
 import { useImageVariant } from '@core/hooks/useImageVariant'
 import { useSettings } from '@core/hooks/useSettings'
 
-const LoginV2 = ({ mode }: { mode: Mode }) => {
+
+
+const Login = ({ mode }: { mode: Mode }) => {
   // States
   const [isPasswordShown, setIsPasswordShown] = useState(false)
 
@@ -46,7 +47,6 @@ const LoginV2 = ({ mode }: { mode: Mode }) => {
   const borderedLightIllustration = '/images/illustrations/auth/v2-login-light-border.png'
 
   // Hooks
-  const navigate = useNavigate()
   const { settings } = useSettings()
   const authBackground = useImageVariant(mode, lightImg, darkImg)
 
@@ -80,7 +80,10 @@ const LoginV2 = ({ mode }: { mode: Mode }) => {
         <img src={authBackground} className='absolute bottom-[4%] z-[-1] is-full max-md:hidden' />
       </div>
       <div className='flex justify-center items-center bs-full bg-backgroundPaper !min-is-full p-6 md:!min-is-[unset] md:p-12 md:is-[480px]'>
-        <Link className='absolute block-start-5 sm:block-start-[38px] inline-start-6 sm:inline-start-[38px]'>
+        <Link
+          href="/"
+          className='absolute block-start-5 sm:block-start-[38px] inline-start-6 sm:inline-start-[38px]'
+        >
           <Logo />
         </Link>
         <div className='flex flex-col gap-5 is-full sm:is-auto md:is-full sm:max-is-[400px] md:max-is-[unset] mbs-11 sm:mbs-14 md:mbs-0'>
@@ -88,15 +91,7 @@ const LoginV2 = ({ mode }: { mode: Mode }) => {
             <Typography variant='h4'>{`Welcome to ${themeConfig.templateName}! 👋🏻`}</Typography>
             <Typography className='mbs-1'>Please sign-in to your account and start the adventure</Typography>
           </div>
-          <form
-            noValidate
-            autoComplete='off'
-            onSubmit={e => {
-              e.preventDefault()
-              navigate('/')
-            }}
-            className='flex flex-col gap-5'
-          >
+          <form noValidate autoComplete='off' onSubmit={e => e.preventDefault()} className='flex flex-col gap-5'>
             <TextField autoFocus fullWidth label='Email' />
             <TextField
               fullWidth
@@ -121,7 +116,12 @@ const LoginV2 = ({ mode }: { mode: Mode }) => {
             />
             <div className='flex justify-between items-center flex-wrap gap-x-3 gap-y-1'>
               <FormControlLabel control={<Checkbox />} label='Remember me' />
-              <Typography className='text-end' color='primary.main' component={Link}>
+              <Typography
+                className='text-end'
+                color='primary.main'
+                component={Link}
+                href="/pages/auth/forgot-password-v2"
+              >
                 Forgot password?
               </Typography>
             </div>
@@ -130,7 +130,11 @@ const LoginV2 = ({ mode }: { mode: Mode }) => {
             </Button>
             <div className='flex justify-center items-center flex-wrap gap-2'>
               <Typography>New on our platform?</Typography>
-              <Typography component={Link} color='primary.main'>
+              <Typography
+                component={Link}
+                href="/pages/auth/register-v2"
+                color='primary.main'
+              >
                 Create an account
               </Typography>
             </div>
@@ -156,4 +160,4 @@ const LoginV2 = ({ mode }: { mode: Mode }) => {
   )
 }
 
-export default LoginV2
+export default Login

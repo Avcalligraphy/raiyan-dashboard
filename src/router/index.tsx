@@ -1,4 +1,5 @@
-import { createBrowserRouter, Outlet } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
+import React from "react";
 import DashboardPage from "../pages/dashboard/DashboardPage";
 import LoginPage from "../views/Login";
 import NotFoundPage from "../views/NotFound";
@@ -22,10 +23,10 @@ const LayoutWithProviders = () => (
   </Providers>
 );
 
-const BlankLayoutWithProviders = () => (
+const BlankLayoutWithProviders = ({ children }: { children: React.ReactNode }) => (
   <Providers direction="ltr">
     <BlankLayout systemMode="light">
-      <Outlet />
+      {children}
     </BlankLayout>
   </Providers>
 );
