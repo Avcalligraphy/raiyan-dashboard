@@ -13,6 +13,7 @@ import UserManagementPage from "@/pages/user/UserManagement";
 import TestimonialsPage from "@/pages/Testimonials";
 import CategoryBlogPage from "@/pages/blog/categories/CategoryBlog";
 import TagsBlogPage from "@/pages/blog/tags/TagsBlog";
+import SiteGalleriesPage from "@/pages/SiteGalleries/SiteGalleries";
 
 // Wrapper component to provide context
 const LayoutWithProviders = () => (
@@ -77,6 +78,10 @@ export const router = createBrowserRouter([
       {
         path: "blog/tags",
         element: <TagsBlogPage />,
+      },
+      {
+        path: "site-galleries",
+        element: <SiteGalleriesPage />,
       },
     ],
   },
