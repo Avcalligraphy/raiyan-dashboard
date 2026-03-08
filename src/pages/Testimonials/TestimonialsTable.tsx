@@ -42,6 +42,7 @@ import type { RankingInfo } from '@tanstack/match-sorter-utils'
 // Component Imports
 import CustomAvatar from '@core/components/mui/Avatar'
 import OptionMenu from '@core/components/option-menu'
+import { PermissionTooltip } from '@/components/PermissionTooltip'
 
 
 // Style Imports
@@ -318,9 +319,11 @@ const TestimonialsTable = ({ reviewsData }: { reviewsData?: TestimonialsType[] }
                 <MenuItem value='Pending'>Pending</MenuItem>
               </Select>
             </FormControl>
-            <Button variant='contained' className='max-sm:is-full' startIcon={<i className='ri-upload-2-line' />}>
-              Export
-            </Button>
+            <PermissionTooltip permission="testimonials.read" tooltip="You don't have permission to export testimonials.">
+              <Button variant='contained' className='max-sm:is-full' startIcon={<i className='ri-upload-2-line' />}>
+                Export
+              </Button>
+            </PermissionTooltip>
           </div>
         </div>
         <div className='overflow-x-auto'>

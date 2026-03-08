@@ -22,6 +22,7 @@ import Divider from '@mui/material/Divider'
 
 // Component Imports
 import OptionMenu from '@core/components/option-menu'
+import { PermissionTooltip } from '@/components/PermissionTooltip'
 
 type GalleryItem = {
   id: string
@@ -211,9 +212,11 @@ const GalleryGrid = ({ filters }: Props) => {
           <Typography variant='h5'>
             Galleries ({filteredGalleries.length})
           </Typography>
-          <Button variant='contained' startIcon={<i className='ri-add-line' />}>
-            Add Gallery
-          </Button>
+          <PermissionTooltip permission="galleries.write">
+            <Button variant='contained' startIcon={<i className='ri-add-line' />}>
+              Add Gallery
+            </Button>
+          </PermissionTooltip>
         </div>
         {paginatedGalleries.length === 0 ? (
           <div className='flex flex-col items-center justify-center p-12 gap-4'>

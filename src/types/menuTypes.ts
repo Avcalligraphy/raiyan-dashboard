@@ -15,6 +15,7 @@ import type {
   MenuItemProps as HorizontalMenuItemProps
 } from '@menu/horizontal-menu'
 import type { MenuItemExactMatchUrlProps } from '@menu/types'
+import type { Permission } from '@/configs/permissions'
 
 // Vertical Menu Data
 export type VerticalMenuItemDataType = Omit<
@@ -27,12 +28,14 @@ export type VerticalMenuItemDataType = Omit<
     icon?: string
     prefix?: ReactNode | ChipProps
     suffix?: ReactNode | ChipProps
+    permission?: string
   }
 export type VerticalSubMenuDataType = Omit<VerticalSubMenuProps, 'children' | 'icon' | 'prefix' | 'suffix'> & {
   children: VerticalMenuDataType[]
   icon?: string
   prefix?: ReactNode | ChipProps
   suffix?: ReactNode | ChipProps
+  permission?: Permission
 }
 export type VerticalSectionDataType = Omit<VerticalMenuSectionProps, 'children'> & {
   isSection: boolean
@@ -51,11 +54,13 @@ export type HorizontalMenuItemDataType = Omit<
     icon?: string
     prefix?: ReactNode | ChipProps
     suffix?: ReactNode | ChipProps
+    permission?: Permission
   }
 export type HorizontalSubMenuDataType = Omit<HorizontalSubMenuProps, 'children' | 'icon' | 'prefix' | 'suffix'> & {
   children: HorizontalMenuDataType[]
   icon?: string
   prefix?: ReactNode | ChipProps
   suffix?: ReactNode | ChipProps
+  permission?: Permission
 }
 export type HorizontalMenuDataType = HorizontalMenuItemDataType | HorizontalSubMenuDataType

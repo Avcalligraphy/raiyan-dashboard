@@ -38,6 +38,7 @@ import type {
 // Component Imports
 import AddCustomerDrawer from "./AddCustomerDrawer";
 import CustomAvatar from "@core/components/mui/Avatar";
+import { PermissionTooltip } from "@/components/PermissionTooltip";
 
 // Util Imports
 import { getInitials } from "@/utils/getInitials";
@@ -261,15 +262,17 @@ const UserTablesPage = ({
     <>
       <Card>
         <CardContent className="flex justify-between flex-wrap max-sm:flex-col sm:items-center gap-4">
-          <Button
-            variant="contained"
-            color="primary"
-            className="max-sm:is-full"
-            startIcon={<i className="ri-add-line" />}
-            onClick={() => setCustomerUserOpen(!customerUserOpen)}
-          >
-            Add Customer
-          </Button>
+          <PermissionTooltip permission="users.write">
+            <Button
+              variant="contained"
+              color="primary"
+              className="max-sm:is-full"
+              startIcon={<i className="ri-add-line" />}
+              onClick={() => setCustomerUserOpen(!customerUserOpen)}
+            >
+              Add Customer
+            </Button>
+          </PermissionTooltip>
           <div className="flex gap-4 max-sm:flex-col max-sm:is-full">
             <DebouncedInput
               value={globalFilter ?? ""}

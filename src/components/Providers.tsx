@@ -9,7 +9,11 @@ import type { ChildrenType, Direction, SystemMode } from '@core/types'
 // Context Imports
 import { VerticalNavProvider } from '@menu/contexts/verticalNavContext'
 import { SettingsProvider } from '@core/contexts/settingsContext'
+import { AuthProvider } from '@core/contexts/AuthContext'
 import ThemeProvider from '@components/theme'
+
+// Component Imports
+import ApiClientConfig from '@components/ApiClientConfig'
 
 // Util Imports
 import { getMode, getSettingsFromCookie, getSystemMode } from '@core/utils/clientHelpers'
@@ -35,13 +39,16 @@ const Providers = (props: Props) => {
   }, [])
 
   return (
-    <VerticalNavProvider>
-      <SettingsProvider settingsCookie={settingsCookie} mode={mode}>
-        <ThemeProvider direction={direction} systemMode={systemMode}>
-          {children}
-        </ThemeProvider>
-      </SettingsProvider>
-    </VerticalNavProvider>
+    <AuthProvider>
+      <ApiClientConfig />
+      <VerticalNavProvider>
+        <SettingsProvider settingsCookie={settingsCookie} mode={mode}>
+          <ThemeProvider direction={direction} systemMode={systemMode}>
+            {children}
+          </ThemeProvider>
+        </SettingsProvider>
+      </VerticalNavProvider>
+    </AuthProvider>
   )
 }
 

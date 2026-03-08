@@ -35,6 +35,7 @@ import type { UserManagementType } from "@/types/apps/ecommerceTypes";
 // Component Imports
 import AddTagsDrawer from "./AddTagsDrawer";
 import CustomAvatar from "@core/components/mui/Avatar";
+import { PermissionTooltip } from "@/components/PermissionTooltip";
 
 // Util Imports
 import { getInitials } from "@/utils/getInitials";
@@ -269,15 +270,17 @@ const TagsBlogPage = ({
             >
               Export
             </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              className="max-sm:is-full"
-              startIcon={<i className="ri-add-line" />}
-              onClick={() => setCustomerUserOpen(!customerUserOpen)}
-            >
-              Add Facility
-            </Button>
+            <PermissionTooltip permission="blog.write">
+              <Button
+                variant="contained"
+                color="primary"
+                className="max-sm:is-full"
+                startIcon={<i className="ri-add-line" />}
+                onClick={() => setCustomerUserOpen(!customerUserOpen)}
+              >
+                Add Facility
+              </Button>
+            </PermissionTooltip>
           </div>
         </CardContent>
         <div className="overflow-x-auto">

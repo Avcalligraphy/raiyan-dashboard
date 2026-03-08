@@ -41,6 +41,7 @@ import TableFilters from './TableFilters'
 import CustomAvatar from '@core/components/mui/Avatar'
 import OptionMenu from '@core/components/option-menu'
 import AddProductDrawer from './AddProductDrawer'
+import { PermissionTooltip } from '@/components/PermissionTooltip'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
@@ -396,6 +397,7 @@ const ProductListTable = ({ productData }: { productData?: ProductType[] }) => {
             >
               Export
             </Button>
+            <PermissionTooltip permission="packages.write">
             <Button
               variant='contained'
               onClick={() => setAddProductOpen(true)}
@@ -404,6 +406,7 @@ const ProductListTable = ({ productData }: { productData?: ProductType[] }) => {
             >
               Add Product
             </Button>
+          </PermissionTooltip>
           </div>
         </div>
         <div className='overflow-x-auto'>

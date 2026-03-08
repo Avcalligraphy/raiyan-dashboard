@@ -14,6 +14,10 @@ import verticalMenuData from '@data/navigation/verticalMenuData'
 
 // Hook Imports
 import useVerticalNav from '@menu/hooks/useVerticalNav'
+import { useAuth } from '@core/hooks/useAuth'
+
+// Util Imports
+import { filterMenuByPermission } from '@/utils/menuFilter'
 
 // Styled Component Imports
 import StyledVerticalNavExpandIcon from '@menu/styles/vertical/StyledVerticalNavExpandIcon'
@@ -41,9 +45,11 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   // Hooks
   const theme = useTheme()
   const verticalNavOptions = useVerticalNav()
+  const { hasPermission } = useAuth()
 
   // Vars
   const { isBreakpointReached, transitionDuration } = verticalNavOptions
+  const menuData = filterMenuByPermission(verticalMenuData(), hasPermission)
 
   const ScrollWrapper = isBreakpointReached ? 'div' : PerfectScrollbar
 
@@ -70,7 +76,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         renderExpandedMenuItemIcon={{ icon: <i className='ri-circle-fill' /> }}
         menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)}
       >
-        <GenerateVerticalMenu menuData={verticalMenuData()} />
+        <GenerateVerticalMenu menuData={menuData} />
       </Menu>
     </ScrollWrapper>
   )

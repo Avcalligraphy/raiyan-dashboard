@@ -12,6 +12,10 @@ import horizontalMenuData from '@data/navigation/horizontalMenuData'
 
 // Hook Imports
 import useVerticalNav from '@menu/hooks/useVerticalNav'
+import { useAuth } from '@core/hooks/useAuth'
+
+// Util Imports
+import { filterMenuByPermission } from '@/utils/menuFilter'
 
 // Styled Component Imports
 import StyledHorizontalNavExpandIcon from '@menu/styles/horizontal/StyledHorizontalNavExpandIcon'
@@ -48,9 +52,11 @@ const HorizontalMenu = () => {
   // Hooks
   const verticalNavOptions = useVerticalNav()
   const theme = useTheme()
+  const { hasPermission } = useAuth()
 
   // Vars
   const { transitionDuration } = verticalNavOptions
+  const menuData = filterMenuByPermission(horizontalMenuData(), hasPermission)
 
   return (
     <HorizontalNav
@@ -78,7 +84,7 @@ const HorizontalMenu = () => {
           renderExpandedMenuItemIcon: { icon: <i className='ri-circle-fill' /> }
         }}
       >
-        <GenerateHorizontalMenu menuData={horizontalMenuData()} />
+        <GenerateHorizontalMenu menuData={menuData} />
       </Menu>
     </HorizontalNav>
   )

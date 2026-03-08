@@ -1,11 +1,11 @@
 import { createBrowserRouter } from "react-router-dom";
-import React from "react";
 import DashboardPage from "../pages/dashboard/DashboardPage";
 import LoginPage from "../views/Login";
 import NotFoundPage from "../views/NotFound";
-import Layout from "../components/layout/Layout";
-import BlankLayout from "../@layouts/BlankLayout";
-import Providers from "../components/Providers";
+import {
+  LayoutWithProviders,
+  BlankLayoutWithProviders,
+} from "./routeWrappers";
 import ListPackagesPage from "../pages/package/list/ListPackage";
 import DeparturePackagesPage from "@/pages/package/departure/DeparturePackage";
 import HotelsPackagesPage from "@/pages/package/hotels/HotelsPackage";
@@ -15,21 +15,6 @@ import TestimonialsPage from "@/pages/Testimonials";
 import CategoryBlogPage from "@/pages/blog/categories/CategoryBlog";
 import TagsBlogPage from "@/pages/blog/tags/TagsBlog";
 import SiteGalleriesPage from "@/pages/SiteGalleries/SiteGalleries";
-
-// Wrapper component to provide context
-const LayoutWithProviders = () => (
-  <Providers direction="ltr">
-    <Layout />
-  </Providers>
-);
-
-const BlankLayoutWithProviders = ({ children }: { children: React.ReactNode }) => (
-  <Providers direction="ltr">
-    <BlankLayout systemMode="light">
-      {children}
-    </BlankLayout>
-  </Providers>
-);
 
 export const router = createBrowserRouter([
   {
