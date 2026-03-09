@@ -14,10 +14,8 @@ const verticalMenuData = (): VerticalMenuDataType[] => [
     permission: 'packages.read',
     children: [
       { label: 'List', href: '/package/list' },
-      { label: 'Departure', href: '/package/departure' },
       { label: 'Hotels', href: '/package/hotels' },
       { label: 'Facility', href: '/package/facility' },
-      { label: 'Gallery', href: '/package/gallery' }
     ]
   },
   {

@@ -14,10 +14,8 @@ const horizontalMenuData = (): HorizontalMenuDataType[] => [
     permission: 'packages.read',
     children: [
       { label: 'List', icon: 'ri-list-check', href: '/package/list' },
-      { label: 'Departure', icon: 'ri-calendar-event-line', href: '/package/departure' },
       { label: 'Hotels', icon: 'ri-hotel-line', href: '/package/hotels' },
       { label: 'Facility', icon: 'ri-building-2-line', href: '/package/facility' },
-      { label: 'Gallery', icon: 'ri-gallery-line', href: '/package/gallery' }
     ]
   },
   {

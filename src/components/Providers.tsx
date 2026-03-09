@@ -3,6 +3,9 @@
 // React Imports
 import { useEffect, useState } from 'react'
 
+// Third-party Imports
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
 // Type Imports
 import type { ChildrenType, Direction, SystemMode } from '@core/types'
 
@@ -17,6 +20,17 @@ import ApiClientConfig from '@components/ApiClientConfig'
 
 // Util Imports
 import { getMode, getSettingsFromCookie, getSystemMode } from '@core/utils/clientHelpers'
+
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    },
+  },
+})
 
 type Props = ChildrenType & {
   direction: Direction
@@ -39,16 +53,18 @@ const Providers = (props: Props) => {
   }, [])
 
   return (
-    <AuthProvider>
-      <ApiClientConfig />
-      <VerticalNavProvider>
-        <SettingsProvider settingsCookie={settingsCookie} mode={mode}>
-          <ThemeProvider direction={direction} systemMode={systemMode}>
-            {children}
-          </ThemeProvider>
-        </SettingsProvider>
-      </VerticalNavProvider>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <ApiClientConfig />
+        <VerticalNavProvider>
+          <SettingsProvider settingsCookie={settingsCookie} mode={mode}>
+            <ThemeProvider direction={direction} systemMode={systemMode}>
+              {children}
+            </ThemeProvider>
+          </SettingsProvider>
+        </VerticalNavProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   )
 }
 

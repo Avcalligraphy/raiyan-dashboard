@@ -37,10 +37,10 @@ export const router = createBrowserRouter([
         path: "package/list",
         element: <ListPackagesPage />,
       },
-      {
-        path: "package/departure",
-        element: <DeparturePackagesPage />,
-      },
+      // {
+      //   path: "package/departure",
+      //   element: <DeparturePackagesPage />,
+      // },
       {
         path: "package/hotels",
         element: <HotelsPackagesPage />,
