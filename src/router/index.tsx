@@ -2,12 +2,8 @@ import { createBrowserRouter } from "react-router-dom";
 import DashboardPage from "../pages/dashboard/DashboardPage";
 import LoginPage from "../views/Login";
 import NotFoundPage from "../views/NotFound";
-import {
-  LayoutWithProviders,
-  BlankLayoutWithProviders,
-} from "./routeWrappers";
+import { LayoutWithProviders, BlankLayoutWithProviders } from "./routeWrappers";
 import ListPackagesPage from "../pages/package/list/ListPackage";
-import DeparturePackagesPage from "@/pages/package/departure/DeparturePackage";
 import HotelsPackagesPage from "@/pages/package/hotels/HotelsPackage";
 import FacilityPackagesPage from "@/pages/package/Facility/FacilityPackage";
 import UserManagementPage from "@/pages/user/UserManagement";
@@ -15,6 +11,8 @@ import TestimonialsPage from "@/pages/Testimonials";
 import CategoryBlogPage from "@/pages/blog/categories/CategoryBlog";
 import TagsBlogPage from "@/pages/blog/tags/TagsBlog";
 import SiteGalleriesPage from "@/pages/SiteGalleries/SiteGalleries";
+import PackageAdd from "@/pages/package/Add";
+import PackageEdit from "@/pages/package/Edit";
 
 export const router = createBrowserRouter([
   {
@@ -68,6 +66,14 @@ export const router = createBrowserRouter([
       {
         path: "site-galleries",
         element: <SiteGalleriesPage />,
+      },
+      {
+        path: "package/add",
+        element: <PackageAdd />,
+      },
+      {
+        path: "package/edit/:id",
+        element: <PackageEdit />,
       },
     ],
   },

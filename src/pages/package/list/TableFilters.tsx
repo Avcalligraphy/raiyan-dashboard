@@ -1,116 +1,122 @@
 // React Imports
-import { useState, useEffect } from 'react'
+import { useCallback } from "react";
 
 // MUI Imports
-import Grid from '@mui/material/Grid2'
-import CardContent from '@mui/material/CardContent'
-import FormControl from '@mui/material/FormControl'
-import InputLabel from '@mui/material/InputLabel'
-import MenuItem from '@mui/material/MenuItem'
-import Select from '@mui/material/Select'
+import Grid from "@mui/material/Grid2";
+import CardContent from "@mui/material/CardContent";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
 
-// Type Imports
-import type { ProductType } from '@/types/apps/ecommerceTypes'
+export type PackageFilterParams = {
+  category?: string;
+  status?: string;
+  is_published?: boolean;
+};
 
-type ProductStockType = { [key: string]: boolean }
+type TableFiltersProps = {
+  category: string;
+  status: string;
+  is_published: string; // '' | 'true' | 'false'
+  onFiltersChange: (params: PackageFilterParams) => void;
+};
 
-// Vars
-const productStockObj: ProductStockType = {
-  'In Stock': true,
-  'Out of Stock': false
-}
+const CATEGORIES = ["", "Reguler", "Premium", "Berbakti", "Ramadhan"];
+const STATUSES = ["", "Available", "Full", "Coming Soon"];
+const PUBLISH_OPTIONS = [
+  { value: "", label: "All" },
+  { value: "true", label: "Published" },
+  { value: "false", label: "Draft" },
+];
 
 const TableFilters = ({
-  setData,
-  productData
-}: {
-  setData: (data: ProductType[]) => void
-  productData?: ProductType[]
-}) => {
-  // States
-  const [category, setCategory] = useState<ProductType['category']>('')
-  const [stock, setStock] = useState('')
-  const [status, setStatus] = useState<ProductType['status']>('')
-
-  useEffect(
-    () => {
-      const filteredData = productData?.filter(product => {
-        if (category && product.category !== category) return false
-        if (stock && product.stock !== productStockObj[stock]) return false
-        if (status && product.status !== status) return false
-
-        return true
-      })
-
-      setData(filteredData ?? [])
+  category,
+  status,
+  is_published,
+  onFiltersChange,
+}: TableFiltersProps) => {
+  const handleCategory = useCallback(
+    (v: string) => {
+      onFiltersChange({ category: v || undefined, status, is_published: is_published === "true" ? true : is_published === "false" ? false : undefined });
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [category, stock, status, productData]
-  )
-
+    [onFiltersChange, status, is_published]
+  );
+  const handleStatus = useCallback(
+    (v: string) => {
+      onFiltersChange({ category, status: v || undefined, is_published: is_published === "true" ? true : is_published === "false" ? false : undefined });
+    },
+    [onFiltersChange, category, is_published]
+  );
+  const handlePublished = useCallback(
+    (v: string) => {
+      onFiltersChange({
+        category,
+        status,
+        is_published: v === "true" ? true : v === "false" ? false : undefined,
+      });
+    },
+    [onFiltersChange, category, status]
+  );
   return (
     <CardContent>
       <Grid container spacing={6}>
         <Grid size={{ xs: 12, sm: 4 }}>
-          <FormControl fullWidth>
-            <InputLabel id='status-select'>Status</InputLabel>
+          <FormControl fullWidth size="small">
+            <InputLabel id="filter-category">Category</InputLabel>
             <Select
-              fullWidth
-              id='select-status'
-              label='Status'
-              value={status}
-              onChange={e => setStatus(e.target.value)}
-              labelId='status-select'
-            >
-              <MenuItem value=''>Select Status</MenuItem>
-              <MenuItem value='Scheduled'>Scheduled</MenuItem>
-              <MenuItem value='Published'>Publish</MenuItem>
-              <MenuItem value='Inactive'>Inactive</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid size={{ xs: 12, sm: 4 }}>
-          <FormControl fullWidth>
-            <InputLabel id='category-select'>Category</InputLabel>
-            <Select
-              fullWidth
-              id='select-category'
+              labelId="filter-category"
+              label="Category"
               value={category}
-              onChange={e => setCategory(e.target.value)}
-              label='Category'
-              labelId='category-select'
+              onChange={(e) => handleCategory(e.target.value)}
             >
-              <MenuItem value=''>Select Category</MenuItem>
-              <MenuItem value='Accessories'>Accessories</MenuItem>
-              <MenuItem value='Home Decor'>Home Decor</MenuItem>
-              <MenuItem value='Electronics'>Electronics</MenuItem>
-              <MenuItem value='Shoes'>Shoes</MenuItem>
-              <MenuItem value='Office'>Office</MenuItem>
-              <MenuItem value='Games'>Games</MenuItem>
+              <MenuItem value="">All</MenuItem>
+              {CATEGORIES.filter(Boolean).map((c) => (
+                <MenuItem key={c} value={c}>
+                  {c}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Grid>
         <Grid size={{ xs: 12, sm: 4 }}>
-          <FormControl fullWidth>
-            <InputLabel id='stock-select'>Stock</InputLabel>
+          <FormControl fullWidth size="small">
+            <InputLabel id="filter-status">Status</InputLabel>
             <Select
-              fullWidth
-              id='select-stock'
-              value={stock}
-              onChange={e => setStock(e.target.value as string)}
-              label='Stock'
-              labelId='stock-select'
+              labelId="filter-status"
+              label="Status"
+              value={status}
+              onChange={(e) => handleStatus(e.target.value)}
             >
-              <MenuItem value=''>Select Stock</MenuItem>
-              <MenuItem value='In Stock'>In Stock</MenuItem>
-              <MenuItem value='Out of Stock'>Out of Stock</MenuItem>
+              <MenuItem value="">All</MenuItem>
+              {STATUSES.filter(Boolean).map((s) => (
+                <MenuItem key={s} value={s}>
+                  {s}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid size={{ xs: 12, sm: 4 }}>
+          <FormControl fullWidth size="small">
+            <InputLabel id="filter-published">Published</InputLabel>
+            <Select
+              labelId="filter-published"
+              label="Published"
+              value={is_published}
+              onChange={(e) => handlePublished(e.target.value)}
+            >
+              {PUBLISH_OPTIONS.map((o) => (
+                <MenuItem key={o.value || "all"} value={o.value}>
+                  {o.label}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Grid>
       </Grid>
     </CardContent>
-  )
-}
+  );
+};
 
-export default TableFilters
-
+export default TableFilters;
