@@ -243,9 +243,9 @@ const colorSchemes = (skin: Skin): Theme['colorSchemes'] => {
         divider: `rgb(var(--mui-mainColorChannels-dark) / 0.12)`,
         dividerChannel: 'var(--mui-mainColorChannels-dark)',
         background: {
-          default: skin === 'bordered' ? '#30334E' : '#282A42',
-          paper: '#30334E',
-          paperChannel: '48 51 78'
+          default: skin === 'bordered' ? '#1e1e1e' : '#121212',
+          paper: '#1e1e1e',
+          paperChannel: '30 30 30'
         },
         action: {
           active: `rgb(var(--mui-mainColorChannels-dark) / 0.6)`,
@@ -277,7 +277,7 @@ const colorSchemes = (skin: Skin): Theme['colorSchemes'] => {
           successFilledBg: 'var(--mui-palette-success-main)'
         },
         Avatar: {
-          defaultBg: '#383B55'
+          defaultBg: '#2d2d2d'
         },
         Chip: {
           defaultBorder: 'var(--mui-palette-divider)'
@@ -296,7 +296,7 @@ const colorSchemes = (skin: Skin): Theme['colorSchemes'] => {
           successBg: 'var(--mui-palette-success-lightOpacity)'
         },
         SnackbarContent: {
-          bg: '#F5F5F5',
+          bg: '#2d2d2d',
           color: 'var(--mui-palette-background-paper)'
         },
         Switch: {
@@ -310,19 +310,19 @@ const colorSchemes = (skin: Skin): Theme['colorSchemes'] => {
           successDisabledColor: 'var(--mui-palette-common-white)'
         },
         Tooltip: {
-          bg: '#F5F5F5'
+          bg: '#2d2d2d'
         },
         TableCell: {
           border: 'var(--mui-palette-divider)'
         },
         customColors: {
-          bodyBg: '#282A42',
-          chatBg: '#343752',
-          greyLightBg: '#333851',
+          bodyBg: '#121212',
+          chatBg: '#1a1a1a',
+          greyLightBg: '#2d2d2d',
           inputBorder: `rgb(var(--mui-mainColorChannels-dark) / 0.22)`,
-          tableHeaderBg: '#3A3E5B',
-          tooltipText: '#30334E',
-          trackBg: '#3C3F59'
+          tableHeaderBg: '#252525',
+          tooltipText: '#e0e0e0',
+          trackBg: '#2d2d2d'
         }
       }
     }
