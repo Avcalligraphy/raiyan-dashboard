@@ -13,7 +13,7 @@ const horizontalMenuData = (): HorizontalMenuDataType[] => [
     icon: 'ri-box-3-line',
     permission: 'packages.read',
     children: [
-      { label: 'List', icon: 'ri-list-check', href: '/package/list', exactMatch: false, activeUrl: '/package' },
+      { label: 'List', icon: 'ri-list-check', href: '/package/list' },
       { label: 'Hotels', icon: 'ri-hotel-line', href: '/package/hotels' },
       { label: 'Facility', icon: 'ri-building-2-line', href: '/package/facility' },
     ]

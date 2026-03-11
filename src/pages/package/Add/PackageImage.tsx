@@ -1,7 +1,7 @@
 "use client";
 
 // React Imports
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
 // MUI Imports
 import Card from "@mui/material/Card";
@@ -9,10 +9,9 @@ import CardHeader from "@mui/material/CardHeader";
 import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import IconButton from "@mui/material/IconButton";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
 import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress";
+import IconButton from "@mui/material/IconButton";
 import { styled } from "@mui/material/styles";
 import type { BoxProps } from "@mui/material/Box";
 
@@ -20,8 +19,11 @@ import type { BoxProps } from "@mui/material/Box";
 import { useDropzone } from "react-dropzone";
 
 // Component Imports
-import Link from "@components/Link";
 import CustomAvatar from "@core/components/mui/Avatar";
+
+// Service Imports
+import { uploadFile } from "@/services/uploadService";
+import { getApiUrl } from "@/services/apiClient";
 
 // Styled Component Imports
 import AppReactDropzone from "@/libs/styles/AppReactDropzone";
@@ -29,21 +31,12 @@ import AppReactDropzone from "@/libs/styles/AppReactDropzone";
 // Type Imports
 import type { PackageFormState } from "@/types/packageTypes";
 
-type FileProp = {
-  name: string;
-  type: string;
-  size: number;
-};
-
 const Dropzone = styled(AppReactDropzone)<BoxProps>(({ theme }) => ({
   "& .dropzone": {
     minHeight: "unset",
     padding: theme.spacing(12),
     [theme.breakpoints.down("sm")]: {
       paddingInline: theme.spacing(5),
-    },
-    "&+.MuiList-root .MuiListItem-root .file-name": {
-      fontWeight: theme.typography.body1.fontWeight,
     },
   },
 }));
@@ -53,120 +46,127 @@ type PackageImageProps = {
   onChange: (patch: Partial<PackageFormState>) => void;
 };
 
-/**
- * Package image UI (dropzone + file list). Upload functionality not wired to backend yet;
- * thumbnail_url can be set via "Add media from URL" or left empty.
- */
-const PackageImage = ({ form, onChange }: PackageImageProps) => {
-  const [files, setFiles] = useState<File[]>([]);
+const ACCEPT_IMAGE = {
+  "image/jpeg": [".jpg", ".jpeg"],
+  "image/png": [".png"],
+  "image/webp": [".webp"],
+  "image/gif": [".gif"],
+};
 
-  const { getRootProps, getInputProps } = useDropzone({
-    onDrop: (acceptedFiles: File[]) => {
-      setFiles(acceptedFiles.map((file: File) => Object.assign(file)));
+const PackageImage = ({ form, onChange }: PackageImageProps) => {
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const onDrop = useCallback(
+    async (acceptedFiles: File[]) => {
+      const file = acceptedFiles[0];
+      if (!file) return;
+      setUploadError(null);
+      setUploading(true);
+      try {
+        const { url } = await uploadFile(file, "packages");
+        onChange({ thumbnail_url: url });
+      } catch (err) {
+        setUploadError(err instanceof Error ? err.message : "Upload failed.");
+      } finally {
+        setUploading(false);
+      }
     },
+    [onChange],
+  );
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: ACCEPT_IMAGE,
+    maxFiles: 1,
+    maxSize: 10 * 1024 * 1024, // 10 MB
+    disabled: uploading,
   });
 
-  const renderFilePreview = (file: FileProp) => {
-    if (file.type.startsWith("image")) {
-      return (
-        <img
-          width={38}
-          height={38}
-          alt={file.name}
-          src={URL.createObjectURL(file as File)}
-        />
-      );
-    }
-    return <i className="ri-file-text-line" />;
+  const handleRemoveThumbnail = () => {
+    onChange({ thumbnail_url: "" });
+    setUploadError(null);
   };
 
-  const handleRemoveFile = (file: FileProp) => {
-    setFiles((prev) => prev.filter((f) => f.name !== file.name));
-  };
-
-  const handleRemoveAllFiles = () => {
-    setFiles([]);
-  };
+  const thumbnailUrl = form.thumbnail_url?.trim() || "";
 
   return (
     <Dropzone>
       <Card>
         <CardHeader
           title="Package Image"
-          action={
-            <Typography
-              component={Link}
-              href="#"
-              color="primary.main"
-              className="font-medium"
-              onClick={(e) => e.preventDefault()}
-            >
-              Add media from URL
-            </Typography>
-          }
-          sx={{ "& .MuiCardHeader-action": { alignSelf: "center" } }}
+          subheader="Upload thumbnail (max 10 MB). JPG, PNG, WebP, GIF."
         />
         <CardContent>
           <div {...getRootProps({ className: "dropzone" })}>
             <input {...getInputProps()} />
             <div className="flex items-center flex-col gap-2 text-center">
-              <CustomAvatar variant="rounded" skin="light" color="secondary">
-                <i className="ri-upload-2-line" />
-              </CustomAvatar>
+              {uploading ? (
+                <CircularProgress size={48} />
+              ) : (
+                <CustomAvatar variant="rounded" skin="light" color="secondary">
+                  <i className="ri-upload-2-line" />
+                </CustomAvatar>
+              )}
               <Typography variant="h4">
-                Drag and Drop Your Image Here.
+                {uploading
+                  ? "Uploading…"
+                  : isDragActive
+                    ? "Drop the image here"
+                    : "Drag and drop your image here, or browse"}
               </Typography>
-              <Typography color="text.disabled">or</Typography>
-              <Button variant="outlined" size="small">
-                Browse Image
-              </Button>
+              {!uploading && (
+                <Button variant="outlined" size="small">
+                  Browse Image
+                </Button>
+              )}
             </div>
           </div>
-          {files.length > 0 ? (
-            <>
-              <List>
-                {files.map((file) => (
-                  <ListItem key={file.name} className="pis-4 plb-3">
-                    <div className="file-details">
-                      <div className="file-preview">
-                        {renderFilePreview(file)}
-                      </div>
-                      <div>
-                        <Typography
-                          className="file-name font-medium"
-                          color="text.primary"
-                        >
-                          {file.name}
-                        </Typography>
-                        <Typography className="file-size" variant="body2">
-                          {Math.round(file.size / 100) / 10 > 1000
-                            ? `${(Math.round(file.size / 100) / 10000).toFixed(1)} mb`
-                            : `${(Math.round(file.size / 100) / 10).toFixed(1)} kb`}
-                        </Typography>
-                      </div>
-                    </div>
-                    <IconButton onClick={() => handleRemoveFile(file)}>
-                      <i className="ri-close-line text-xl" />
-                    </IconButton>
-                  </ListItem>
-                ))}
-              </List>
-              <div className="buttons">
-                <Button
-                  color="error"
-                  variant="outlined"
-                  onClick={handleRemoveAllFiles}
+
+          {uploadError && (
+            <Typography color="error" variant="body2" className="mts-2">
+              {uploadError}
+            </Typography>
+          )}
+
+          {thumbnailUrl ? (
+            <div className="mts-4 flex items-center gap-3 flex-wrap">
+              <div className="relative">
+                <img
+                  src={thumbnailUrl.startsWith("http") ? thumbnailUrl : `${getApiUrl()}${thumbnailUrl}`}
+                  alt="Thumbnail"
+                  className="rounded border"
+                  style={{ maxWidth: 160, maxHeight: 120, objectFit: "cover" }}
+                />
+                <IconButton
+                  size="small"
+                  onClick={handleRemoveThumbnail}
+                  sx={{
+                    position: "absolute",
+                    top: 4,
+                    right: 4,
+                    bgcolor: "background.paper",
+                    "&:hover": { bgcolor: "action.hover" },
+                  }}
                 >
-                  Remove All
-                </Button>
-                <Button variant="contained">Upload Files</Button>
+                  <i className="ri-close-line text-xl" />
+                </IconButton>
               </div>
-            </>
+              <Button
+                color="error"
+                variant="outlined"
+                size="small"
+                onClick={handleRemoveThumbnail}
+              >
+                Remove thumbnail
+              </Button>
+            </div>
           ) : null}
+
           <TextField
             fullWidth
             label="Thumbnail URL (optional)"
-            placeholder="https://…"
+            placeholder="https://… or upload above"
             value={form.thumbnail_url}
             onChange={(e) => onChange({ thumbnail_url: e.target.value })}
             className="mts-4"

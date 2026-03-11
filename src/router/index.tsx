@@ -10,9 +10,10 @@ import UserManagementPage from "@/pages/user/UserManagement";
 import TestimonialsPage from "@/pages/Testimonials";
 import CategoryBlogPage from "@/pages/blog/categories/CategoryBlog";
 import TagsBlogPage from "@/pages/blog/tags/TagsBlog";
-import SiteGalleriesPage from "@/pages/SiteGalleries/SiteGalleries";
+import SiteGalleriesPage from "@/pages/siteGalleries/SiteGalleries";
 import PackageAdd from "@/pages/package/Add";
 import PackageEdit from "@/pages/package/Edit";
+import LegalDocument from "@/pages/legalDocument";
 
 export const router = createBrowserRouter([
   {
@@ -35,10 +36,6 @@ export const router = createBrowserRouter([
         path: "package/list",
         element: <ListPackagesPage />,
       },
-      // {
-      //   path: "package/departure",
-      //   element: <DeparturePackagesPage />,
-      // },
       {
         path: "package/hotels",
         element: <HotelsPackagesPage />,
@@ -66,6 +63,10 @@ export const router = createBrowserRouter([
       {
         path: "site-galleries",
         element: <SiteGalleriesPage />,
+      },
+      {
+        path: "legal-document",
+        element: <LegalDocument />,
       },
       {
         path: "package/add",

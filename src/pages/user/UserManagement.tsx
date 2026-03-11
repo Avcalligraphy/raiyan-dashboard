@@ -2,8 +2,6 @@
 import Grid from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
 
-// Type Imports
-
 // Component Imports
 import UserCards from "./UserCards";
 import UserTables from "./UserTables";
@@ -13,12 +11,11 @@ const UserManagementPage = () => {
     <Grid container spacing={6}>
       <Grid size={{ xs: 12 }}>
         <Typography variant="h4" className="mbe-1">
-          Roles List
+          User Management
         </Typography>
         <Typography>
-          A role provided access to predefined menus and features so that
-          depending on assigned role an administrator can have access to what he
-          need
+          Manage users and roles for Rayyan CMS access. Each role has predefined
+          permissions for menus and features.
         </Typography>
       </Grid>
       <Grid size={{ xs: 12 }}>
@@ -26,11 +23,10 @@ const UserManagementPage = () => {
       </Grid>
       <Grid size={{ xs: 12 }} className="!pbs-12">
         <Typography variant="h4" className="mbe-1">
-          Total users with their roles
+          Users
         </Typography>
         <Typography>
-          Find all of your company&#39;s administrator accounts and their
-          associate roles.
+          List of all users and their assigned roles. Add, edit, or remove access.
         </Typography>
       </Grid>
       <Grid size={{ xs: 12 }}>

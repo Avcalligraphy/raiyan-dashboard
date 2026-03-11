@@ -9,10 +9,6 @@ import TextField from "@mui/material/TextField";
 import TablePagination from "@mui/material/TablePagination";
 import IconButton from "@mui/material/IconButton";
 import Chip from "@mui/material/Chip";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
 import type { TextFieldProps } from "@mui/material/TextField";
 
 // Third-party Imports
@@ -31,14 +27,13 @@ import type { ColumnDef, FilterFn } from "@tanstack/react-table";
 import type { RankingInfo } from "@tanstack/match-sorter-utils";
 
 // Type Imports
-import type { User, Role } from "@/types/userTypes";
+import type { LegalDocument } from "@/types/legalDocumentTypes";
 
 // Component Imports
-import AddUserDrawer from "./AddUserDrawer";
+import AddLegalDrawer from "./AddLegalDrawer";
 import { PermissionTooltip } from "@/components/PermissionTooltip";
-
-// Service Imports
-import { userService, roleService } from "@/services/userService";
+import { getApiUrl } from "@/services/apiClient";
+import { legalDocumentService } from "@/services/legalDocumentService";
 
 // Style Imports
 import tableStyles from "@core/styles/table.module.css";
@@ -52,7 +47,7 @@ declare module "@tanstack/react-table" {
   }
 }
 
-const fuzzyFilter: FilterFn<User> = (row, columnId, value, addMeta) => {
+const fuzzyFilter: FilterFn<LegalDocument> = (row, columnId, value, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), value);
   addMeta({ itemRank });
   return itemRank.passed;
@@ -69,7 +64,9 @@ const DebouncedInput = ({
   debounce?: number;
 } & Omit<TextFieldProps, "onChange">) => {
   const [value, setValue] = useState(initialValue);
-  useEffect(() => setValue(initialValue), [initialValue]);
+  useEffect(() => {
+    setValue(initialValue);
+  }, [initialValue]);
   useEffect(() => {
     const t = setTimeout(() => onChange(value), debounce);
     return () => clearTimeout(t);
@@ -84,94 +81,89 @@ const DebouncedInput = ({
   );
 };
 
-const columnHelper = createColumnHelper<User>();
+const columnHelper = createColumnHelper<LegalDocument>();
 
-const UserTables = () => {
+const LegalDocumentPage = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [users, setUsers] = useState<User[]>([]);
-  const [roles, setRoles] = useState<Role[]>([]);
+  const [editingDoc, setEditingDoc] = useState<LegalDocument | null>(null);
+  const [data, setData] = useState<LegalDocument[]>([]);
   const [loading, setLoading] = useState(true);
   const [globalFilter, setGlobalFilter] = useState("");
-  const [roleFilter, setRoleFilter] = useState<string>("");
 
-  const fetchUsers = useCallback(async () => {
+  const fetchList = async () => {
     setLoading(true);
     try {
-      const list = await userService.list({ limit: 500, offset: 0 });
-      setUsers(list ?? []);
+      const res = await legalDocumentService.list({ limit: 500, offset: 0 });
+      setData(res.data ?? []);
     } catch {
-      setUsers([]);
+      setData([]);
     } finally {
       setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    fetchList();
   }, []);
 
-  const fetchRoles = useCallback(async () => {
+  const handleDelete = useCallback(async (id: string) => {
+    if (!window.confirm("Delete this legal document?")) return;
     try {
-      const list = await roleService.list();
-      setRoles(list ?? []);
-    } catch {
-      setRoles([]);
+      await legalDocumentService.delete(id);
+      fetchList();
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Delete failed");
     }
   }, []);
 
-  useEffect(() => {
-    fetchUsers();
-    fetchRoles();
-  }, [fetchUsers, fetchRoles]);
-
-  const roleMap = useMemo(() => {
-    const m: Record<string, string> = {};
-    roles.forEach((r) => (m[r.id] = r.name));
-    return m;
-  }, [roles]);
-
-  const handleDelete = useCallback(
-    async (id: string) => {
-      if (!window.confirm("Delete this user? They will no longer be able to sign in."))
-        return;
-      try {
-        await userService.delete(id);
-        fetchUsers();
-      } catch (e) {
-        alert(e instanceof Error ? e.message : "Delete failed");
-      }
-    },
-    [fetchUsers],
-  );
-
-  const filteredData = useMemo(() => {
-    if (!roleFilter) return users;
-    return users.filter((u) => (u.role_id ?? "") === roleFilter);
-  }, [users, roleFilter]);
-
   const columns = useMemo(
     () => [
-      columnHelper.accessor("full_name", {
-        header: "Name",
+      columnHelper.accessor("document_name", {
+        header: "Document Name",
         cell: ({ getValue }) => (
           <Typography color="text.primary" className="font-medium">
-            {getValue() || "—"}
+            {getValue()}
           </Typography>
         ),
       }),
-      columnHelper.accessor("email", {
-        header: "Email",
+      columnHelper.accessor("document_number", {
+        header: "Document Number",
         cell: ({ getValue }) => <Typography>{getValue()}</Typography>,
       }),
-      columnHelper.accessor("role_id", {
-        header: "Role",
-        cell: ({ row }) => (
+      columnHelper.accessor("document_type", {
+        header: "Type",
+        cell: ({ getValue }) => (
+          <Chip label={getValue()} size="small" variant="tonal" />
+        ),
+      }),
+      columnHelper.accessor("file_url", {
+        header: "File",
+        cell: ({ row }) => {
+          const url = row.original.file_url?.trim();
+          if (!url) return <Typography color="text.disabled">—</Typography>;
+          const href = url.startsWith("http") ? url : `${getApiUrl()}${url}`;
+          return (
+            <a
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary"
+            >
+              View file
+            </a>
+          );
+        },
+      }),
+      columnHelper.accessor("issued_date", {
+        header: "Issued Date",
+        cell: ({ getValue }) => (
           <Typography>
-            {row.original.role_id
-              ? roleMap[row.original.role_id] ?? row.original.role_id
-              : "—"}
+            {getValue() ? new Date(getValue() as string).toLocaleDateString() : "—"}
           </Typography>
         ),
       }),
       columnHelper.accessor("is_active", {
-        header: "Status",
+        header: "Active",
         cell: ({ getValue }) => (
           <Chip
             label={getValue() ? "Active" : "Inactive"}
@@ -185,18 +177,18 @@ const UserTables = () => {
         header: "Actions",
         cell: ({ row }) => (
           <div className="flex items-center gap-1">
-            <PermissionTooltip permission="users.write">
+            <PermissionTooltip permission="legal.write">
               <IconButton
                 size="small"
                 onClick={() => {
-                  setEditingUser(row.original);
+                  setEditingDoc(row.original);
                   setDrawerOpen(true);
                 }}
               >
                 <i className="ri-pencil-line" />
               </IconButton>
             </PermissionTooltip>
-            <PermissionTooltip permission="users.write">
+            <PermissionTooltip permission="legal.write">
               <IconButton
                 size="small"
                 color="error"
@@ -208,12 +200,12 @@ const UserTables = () => {
           </div>
         ),
       }),
-    ] as ColumnDef<User>[],
-    [roleMap, handleDelete],
+    ] as ColumnDef<LegalDocument>[],
+    [handleDelete],
   );
 
   const table = useReactTable({
-    data: filteredData,
+    data,
     columns,
     filterFns: { fuzzy: fuzzyFilter },
     state: { globalFilter },
@@ -228,12 +220,12 @@ const UserTables = () => {
 
   const handleCloseDrawer = () => {
     setDrawerOpen(false);
-    setEditingUser(null);
-    fetchUsers();
+    setEditingDoc(null);
+    fetchList();
   };
 
-  const handleAddUser = () => {
-    setEditingUser(null);
+  const handleAdd = () => {
+    setEditingDoc(null);
     setDrawerOpen(true);
   };
 
@@ -241,41 +233,23 @@ const UserTables = () => {
     <>
       <Card>
         <CardContent className="flex justify-between flex-wrap max-sm:flex-col sm:items-center gap-4">
-          <div className="flex gap-4 max-sm:flex-col max-sm:is-full flex-wrap">
-            <PermissionTooltip permission="users.write">
-              <Button
-                variant="contained"
-                color="primary"
-                className="max-sm:is-full"
-                startIcon={<i className="ri-add-line" />}
-                onClick={handleAddUser}
-              >
-                Add User
-              </Button>
-            </PermissionTooltip>
-            <DebouncedInput
-              value={globalFilter ?? ""}
-              onChange={(v) => setGlobalFilter(String(v))}
-              placeholder="Search"
+          <DebouncedInput
+            value={globalFilter ?? ""}
+            onChange={(v) => setGlobalFilter(String(v))}
+            placeholder="Search"
+            className="max-sm:is-full"
+          />
+          <PermissionTooltip permission="legal.write">
+            <Button
+              variant="contained"
+              color="primary"
               className="max-sm:is-full"
-            />
-            <FormControl size="small" className="min-is-[150px] max-sm:is-full">
-              <InputLabel id="user-role-filter-label">Role</InputLabel>
-              <Select
-                value={roleFilter}
-                onChange={(e) => setRoleFilter(e.target.value)}
-                label="Role"
-                labelId="user-role-filter-label"
-              >
-                <MenuItem value="">All roles</MenuItem>
-                {roles.map((r) => (
-                  <MenuItem key={r.id} value={r.id}>
-                    {r.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </div>
+              startIcon={<i className="ri-add-line" />}
+              onClick={handleAdd}
+            >
+              Add Legal Document
+            </Button>
+          </PermissionTooltip>
         </CardContent>
         <div className="overflow-x-auto">
           <table className={tableStyles.table}>
@@ -286,10 +260,7 @@ const UserTables = () => {
                     <th key={h.id}>
                       {h.isPlaceholder
                         ? null
-                        : flexRender(
-                            h.column.columnDef.header,
-                            h.getContext(),
-                          )}
+                        : flexRender(h.column.columnDef.header, h.getContext())}
                     </th>
                   ))}
                 </tr>
@@ -310,18 +281,10 @@ const UserTables = () => {
                 </tr>
               ) : (
                 table.getRowModel().rows.map((row) => (
-                  <tr
-                    key={row.id}
-                    className={classnames({
-                      selected: row.getIsSelected(),
-                    })}
-                  >
+                  <tr key={row.id} className={classnames({ selected: row.getIsSelected() })}>
                     {row.getVisibleCells().map((cell) => (
                       <td key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </td>
                     ))}
                   </tr>
@@ -338,19 +301,16 @@ const UserTables = () => {
           rowsPerPage={table.getState().pagination.pageSize}
           page={table.getState().pagination.pageIndex}
           onPageChange={(_, page) => table.setPageIndex(page)}
-          onRowsPerPageChange={(e) =>
-            table.setPageSize(Number(e.target.value))
-          }
+          onRowsPerPageChange={(e) => table.setPageSize(Number(e.target.value))}
         />
       </Card>
-      <AddUserDrawer
+      <AddLegalDrawer
         open={drawerOpen}
         handleClose={handleCloseDrawer}
-        user={editingUser}
-        onSuccess={fetchUsers}
+        document={editingDoc}
       />
     </>
   );
 };
 
-export default UserTables;
+export default LegalDocumentPage;

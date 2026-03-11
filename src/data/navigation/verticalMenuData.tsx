@@ -13,7 +13,7 @@ const verticalMenuData = (): VerticalMenuDataType[] => [
     icon: 'ri-box-3-line',
     permission: 'packages.read',
     children: [
-      { label: 'List', href: '/package/list', exactMatch: false, activeUrl: '/package' },
+      { label: 'List', href: '/package/list' },
       { label: 'Hotels', href: '/package/hotels' },
       { label: 'Facility', href: '/package/facility' },
     ]
