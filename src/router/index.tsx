@@ -18,6 +18,7 @@ import BlogPostListPage from "@/pages/blog/post/list";
 import BlogPostAddPage from "@/pages/blog/post/add";
 import BlogPostEditPage from "@/pages/blog/post/edit";
 import SiteGalleriesPage from "@/pages/siteGalleries/SiteGalleries";
+import LeadPage from "@/pages/lead";
 
 export const router = createBrowserRouter([
   {
@@ -91,6 +92,10 @@ export const router = createBrowserRouter([
       {
         path: "package/edit/:id",
         element: <PackageEdit />,
+      },
+      {
+        path: "lead-crm",
+        element: <LeadPage />,
       },
     ],
   },
