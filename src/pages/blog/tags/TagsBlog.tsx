@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 
 // MUI Imports
 import Card from "@mui/material/Card";
@@ -8,10 +8,10 @@ import Typography from "@mui/material/Typography";
 import Checkbox from "@mui/material/Checkbox";
 import TextField from "@mui/material/TextField";
 import TablePagination from "@mui/material/TablePagination";
+import IconButton from "@mui/material/IconButton";
 import type { TextFieldProps } from "@mui/material/TextField";
 
 // Third-party Imports
-import { Link } from "react-router-dom";
 import classnames from "classnames";
 import { rankItem } from "@tanstack/match-sorter-utils";
 import {
@@ -30,20 +30,18 @@ import type { ColumnDef, FilterFn } from "@tanstack/react-table";
 import type { RankingInfo } from "@tanstack/match-sorter-utils";
 
 // Type Imports
-import type { UserManagementType } from "@/types/apps/ecommerceTypes";
+import type { BlogTag } from "@/services/blogTagService";
 
 // Component Imports
 import AddTagsDrawer from "./AddTagsDrawer";
-import CustomAvatar from "@core/components/mui/Avatar";
 import { PermissionTooltip } from "@/components/PermissionTooltip";
 
-// Util Imports
-import { getInitials } from "@/utils/getInitials";
+// Hooks Imports
+import { useBlogTags, useDeleteBlogTag } from "@/hooks/useBlogTags";
 
 // Style Imports
 import tableStyles from "@core/styles/table.module.css";
 
-// Augment TanStack Table for fuzzy filter (table-core may be bundled)
 declare module "@tanstack/react-table" {
   interface FilterFns {
     fuzzy: FilterFn<unknown>;
@@ -53,25 +51,20 @@ declare module "@tanstack/react-table" {
   }
 }
 
-type ECommerceOrderTypeWithAction = UserManagementType & {
+type BlogTagWithAction = BlogTag & {
   action?: string;
 };
 
-const fuzzyFilter: FilterFn<ECommerceOrderTypeWithAction> = (
+const fuzzyFilter: FilterFn<BlogTagWithAction> = (
   row,
   columnId,
   value,
   addMeta,
 ) => {
-  // Rank the item
   const itemRank = rankItem(row.getValue(columnId), value);
-
-  // Store the itemRank info
   addMeta({
     itemRank,
   });
-
-  // Return if the item should be filtered in/out
   return itemRank.passed;
 };
 
@@ -85,7 +78,6 @@ const DebouncedInput = ({
   onChange: (value: string | number) => void;
   debounce?: number;
 } & Omit<TextFieldProps, "onChange">) => {
-  // States
   const [value, setValue] = useState(initialValue);
 
   useEffect(() => {
@@ -111,19 +103,16 @@ const DebouncedInput = ({
   );
 };
 
-// Column Definitions
-const columnHelper = createColumnHelper<ECommerceOrderTypeWithAction>();
+const columnHelper = createColumnHelper<BlogTagWithAction>();
 
-const TagsBlogPage = ({
-  customerData,
-}: {
-  customerData?: UserManagementType[];
-}) => {
-  // States
-  const [customerUserOpen, setCustomerUserOpen] = useState(false);
+const TagsBlogPage = () => {
+  const [tagDrawerOpen, setTagDrawerOpen] = useState(false);
+  const [selectedTag, setSelectedTag] = useState<BlogTag | null>(null);
   const [rowSelection, setRowSelection] = useState({});
-  const [data, setData] = useState<UserManagementType[]>(customerData ?? []);
   const [globalFilter, setGlobalFilter] = useState("");
+
+  const { data: tags = [], isLoading, error } = useBlogTags();
+  const deleteTag = useDeleteBlogTag();
 
   const columns = useMemo(
     () =>
@@ -150,64 +139,64 @@ const TagsBlogPage = ({
             />
           ),
         },
-        columnHelper.accessor("customer", {
-          header: "Customers",
+        columnHelper.accessor("name", {
+          header: "Name",
           cell: ({ row }) => (
-            <div className="flex items-center gap-3">
-              {getAvatar({
-                avatar: row.original.avatar,
-                customer: row.original.customer,
-              })}
-              <div className="flex flex-col items-start">
-                <Typography
-                  component={Link}
-                  to={`/user-management/details/${row.original.customerId}`}
-                  color="text.primary"
-                  className="font-medium hover:text-primary"
-                >
-                  {row.original.customer}
-                </Typography>
-                <Typography variant="body2">{row.original.email}</Typography>
-              </div>
-            </div>
-          ),
-        }),
-        columnHelper.accessor("customerId", {
-          header: "Customer Id",
-          cell: ({ row }) => (
-            <Typography color="text.primary">
-              #{row.original.customerId}
+            <Typography color="text.primary" className="font-medium">
+              {row.original.name}
             </Typography>
           ),
         }),
-        columnHelper.accessor("country", {
-          header: "Country",
+        columnHelper.accessor("slug", {
+          header: "Slug",
+          cell: ({ row }) => (
+            <Typography variant="body2" color="text.secondary">
+              {row.original.slug}
+            </Typography>
+          ),
+        }),
+        {
+          id: "actions",
+          header: "Actions",
           cell: ({ row }) => (
             <div className="flex items-center gap-2">
-              <img src={row.original.countryFlag} height={22} />
-              <Typography>{row.original.country}</Typography>
+              <PermissionTooltip permission="blog.write">
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    setSelectedTag(row.original);
+                    setTagDrawerOpen(true);
+                  }}
+                >
+                  <i className="ri-pencil-line" />
+                </IconButton>
+              </PermissionTooltip>
+              <PermissionTooltip permission="blog.write">
+                <IconButton
+                  size="small"
+                  color="error"
+                  onClick={() => {
+                    if (
+                      window.confirm(
+                        `Are you sure you want to delete "${row.original.name}"?`
+                      )
+                    ) {
+                      deleteTag.mutate(row.original.id);
+                    }
+                  }}
+                >
+                  <i className="ri-delete-bin-line" />
+                </IconButton>
+              </PermissionTooltip>
             </div>
           ),
-        }),
-        columnHelper.accessor("order", {
-          header: "Orders",
-          cell: ({ row }) => <Typography>{row.original.order}</Typography>,
-        }),
-        columnHelper.accessor("totalSpent", {
-          header: "Total Spent",
-          cell: ({ row }) => (
-            <Typography className="font-medium" color="text.primary">
-              ${row.original.totalSpent.toLocaleString()}
-            </Typography>
-          ),
-        }),
-      ] as ColumnDef<ECommerceOrderTypeWithAction>[],
-    [],
+        },
+      ] as ColumnDef<BlogTagWithAction>[],
+    [deleteTag]
   );
 
-  // TanStack Table: API returns non-memoizable functions; React Compiler skips this component
   const table = useReactTable({
-    data,
+    data: tags,
     columns,
     filterFns: {
       fuzzy: fuzzyFilter,
@@ -221,8 +210,7 @@ const TagsBlogPage = ({
         pageSize: 10,
       },
     },
-    enableRowSelection: true, //enable row selection for all rows
-    // enableRowSelection: row => row.original.age > 18, // or enable row selection conditionally per row
+    enableRowSelection: true,
     globalFilterFn: fuzzyFilter,
     onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
@@ -235,21 +223,28 @@ const TagsBlogPage = ({
     getFacetedMinMaxValues: getFacetedMinMaxValues(),
   });
 
-  const getAvatar = (
-    params: Pick<UserManagementType, "avatar" | "customer">,
-  ) => {
-    const { avatar, customer } = params;
-
-    if (avatar) {
-      return <CustomAvatar src={avatar} skin="light" size={34} />;
-    } else {
-      return (
-        <CustomAvatar skin="light" size={34}>
-          {getInitials(customer as string)}
-        </CustomAvatar>
-      );
-    }
+  const handleAddTag = () => {
+    setSelectedTag(null);
+    setTagDrawerOpen(true);
   };
+
+  const handleCloseDrawer = () => {
+    setTagDrawerOpen(false);
+    setSelectedTag(null);
+  };
+
+  if (error) {
+    return (
+      <Card>
+        <CardContent>
+          <Typography color="error">
+            Error loading tags:{" "}
+            {error instanceof Error ? error.message : "Unknown error"}
+          </Typography>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <>
@@ -258,7 +253,7 @@ const TagsBlogPage = ({
           <DebouncedInput
             value={globalFilter ?? ""}
             onChange={(value) => setGlobalFilter(String(value))}
-            placeholder="Search"
+            placeholder="Search tags..."
             className="max-sm:is-full"
           />
           <div className="flex gap-4 max-sm:flex-col max-sm:is-full">
@@ -276,109 +271,123 @@ const TagsBlogPage = ({
                 color="primary"
                 className="max-sm:is-full"
                 startIcon={<i className="ri-add-line" />}
-                onClick={() => setCustomerUserOpen(!customerUserOpen)}
+                onClick={handleAddTag}
               >
-                Add Facility
+                Add Tag
               </Button>
             </PermissionTooltip>
           </div>
         </CardContent>
-        <div className="overflow-x-auto">
-          <table className={tableStyles.table}>
-            <thead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <th key={header.id}>
-                      {header.isPlaceholder ? null : (
-                        <>
-                          <div
-                            className={classnames({
-                              "flex items-center": header.column.getIsSorted(),
-                              "cursor-pointer select-none":
-                                header.column.getCanSort(),
-                            })}
-                            onClick={header.column.getToggleSortingHandler()}
-                          >
-                            {flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
-                            {{
-                              asc: <i className="ri-arrow-up-s-line text-xl" />,
-                              desc: (
-                                <i className="ri-arrow-down-s-line text-xl" />
-                              ),
-                            }[header.column.getIsSorted() as "asc" | "desc"] ??
-                              null}
-                          </div>
-                        </>
-                      )}
-                    </th>
+        {isLoading ? (
+          <CardContent>
+            <Typography>Loading tags...</Typography>
+          </CardContent>
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className={tableStyles.table}>
+                <thead>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <tr key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => (
+                        <th key={header.id}>
+                          {header.isPlaceholder ? null : (
+                            <>
+                              <div
+                                className={classnames({
+                                  "flex items-center":
+                                    header.column.getIsSorted(),
+                                  "cursor-pointer select-none":
+                                    header.column.getCanSort(),
+                                })}
+                                onClick={header.column.getToggleSortingHandler()}
+                              >
+                                {flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext()
+                                )}
+                                {{
+                                  asc: (
+                                    <i className="ri-arrow-up-s-line text-xl" />
+                                  ),
+                                  desc: (
+                                    <i className="ri-arrow-down-s-line text-xl" />
+                                  ),
+                                }[
+                                  header.column.getIsSorted() as "asc" | "desc"
+                                ] ?? null}
+                              </div>
+                            </>
+                          )}
+                        </th>
+                      ))}
+                    </tr>
                   ))}
-                </tr>
-              ))}
-            </thead>
-            {table.getFilteredRowModel().rows.length === 0 ? (
-              <tbody>
-                <tr>
-                  <td
-                    colSpan={table.getVisibleFlatColumns().length}
-                    className="text-center"
-                  >
-                    No data available
-                  </td>
-                </tr>
-              </tbody>
-            ) : (
-              <tbody>
-                {table
-                  .getRowModel()
-                  .rows.slice(0, table.getState().pagination.pageSize)
-                  .map((row) => {
-                    return (
-                      <tr
-                        key={row.id}
-                        className={classnames({
-                          selected: row.getIsSelected(),
-                        })}
+                </thead>
+                {table.getFilteredRowModel().rows.length === 0 ? (
+                  <tbody>
+                    <tr>
+                      <td
+                        colSpan={table.getVisibleFlatColumns().length}
+                        className="text-center"
                       >
-                        {row.getVisibleCells().map((cell) => (
-                          <td key={cell.id}>
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext(),
-                            )}
-                          </td>
-                        ))}
-                      </tr>
-                    );
-                  })}
-              </tbody>
-            )}
-          </table>
-        </div>
-        <TablePagination
-          rowsPerPageOptions={[10, 25, 50, 100]}
-          component="div"
-          className="border-bs"
-          count={table.getFilteredRowModel().rows.length}
-          rowsPerPage={table.getState().pagination.pageSize}
-          page={table.getState().pagination.pageIndex}
-          SelectProps={{
-            inputProps: { "aria-label": "rows per page" },
-          }}
-          onPageChange={(_, page) => {
-            table.setPageIndex(page);
-          }}
-          onRowsPerPageChange={(e) => table.setPageSize(Number(e.target.value))}
-        />
+                        No tags yet. Add one to get started.
+                      </td>
+                    </tr>
+                  </tbody>
+                ) : (
+                  <tbody>
+                    {table
+                      .getRowModel()
+                      .rows.slice(
+                        0,
+                        table.getState().pagination.pageSize
+                      )
+                      .map((row) => (
+                        <tr
+                          key={row.id}
+                          className={classnames({
+                            selected: row.getIsSelected(),
+                          })}
+                        >
+                          {row.getVisibleCells().map((cell) => (
+                            <td key={cell.id}>
+                              {flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext()
+                              )}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                  </tbody>
+                )}
+              </table>
+            </div>
+            <TablePagination
+              rowsPerPageOptions={[10, 25, 50, 100]}
+              component="div"
+              className="border-bs"
+              count={table.getFilteredRowModel().rows.length}
+              rowsPerPage={table.getState().pagination.pageSize}
+              page={table.getState().pagination.pageIndex}
+              SelectProps={{
+                inputProps: { "aria-label": "rows per page" },
+              }}
+              onPageChange={(_, page) => {
+                table.setPageIndex(page);
+              }}
+              onRowsPerPageChange={(e) =>
+                table.setPageSize(Number(e.target.value))
+              }
+            />
+          </>
+        )}
       </Card>
       <AddTagsDrawer
-        open={customerUserOpen}
-        handleClose={() => setCustomerUserOpen(!customerUserOpen)}
-        setData={setData}
-        customerData={data}
+        open={tagDrawerOpen}
+        handleClose={handleCloseDrawer}
+        tag={selectedTag}
       />
     </>
   );

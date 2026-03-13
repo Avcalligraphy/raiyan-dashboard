@@ -14,7 +14,10 @@ import TagsBlogPage from "@/pages/blog/tags/TagsBlog";
 import PackageAdd from "@/pages/package/Add";
 import PackageEdit from "@/pages/package/Edit";
 import LegalDocument from "@/pages/legalDocument";
-import SiteGalleriesPage from "@/pages/SiteGalleries/SiteGalleries";
+import BlogPostListPage from "@/pages/blog/post/list";
+import BlogPostAddPage from "@/pages/blog/post/add";
+import BlogPostEditPage from "@/pages/blog/post/edit";
+import SiteGalleriesPage from "@/pages/siteGalleries/SiteGalleries";
 
 export const router = createBrowserRouter([
   {
@@ -60,6 +63,18 @@ export const router = createBrowserRouter([
       {
         path: "blog/tags",
         element: <TagsBlogPage />,
+      },
+      {
+        path: "blog/post",
+        element: <BlogPostListPage />,
+      },
+      {
+        path: "blog/post/add",
+        element: <BlogPostAddPage />,
+      },
+      {
+        path: "blog/post/edit/:id",
+        element: <BlogPostEditPage />,
       },
       {
         path: "site-galleries",
