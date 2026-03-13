@@ -10,10 +10,11 @@ import UserManagementPage from "@/pages/user/UserManagement";
 import TestimonialsPage from "@/pages/Testimonials";
 import CategoryBlogPage from "@/pages/blog/categories/CategoryBlog";
 import TagsBlogPage from "@/pages/blog/tags/TagsBlog";
-import SiteGalleriesPage from "@/pages/siteGalleries/SiteGalleries";
+
 import PackageAdd from "@/pages/package/Add";
 import PackageEdit from "@/pages/package/Edit";
 import LegalDocument from "@/pages/legalDocument";
+import SiteGalleriesPage from "@/pages/SiteGalleries/SiteGalleries";
 
 export const router = createBrowserRouter([
   {
