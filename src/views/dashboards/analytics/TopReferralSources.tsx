@@ -246,7 +246,7 @@ const TopReferralSources = () => {
   // State
   const [value, setValue] = useState<string>('google')
 
-  const handleChange = (event: SyntheticEvent, newValue: string) => {
+  const handleChange = (_event: SyntheticEvent, newValue: string) => {
     setValue(newValue)
   }
 

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { notificationService } from '../services/notifications/notificationService';
-import type { NotificationOptions } from '../services/notifications/notificationService';
+import type { AppNotificationOptions } from '../services/notifications/notificationService';
 
 export const useNotifications = () => {
   const [permission, setPermission] = useState<NotificationPermission>('default');
@@ -17,7 +17,7 @@ export const useNotifications = () => {
     return result;
   }, []);
 
-  const showNotification = useCallback(async (options: NotificationOptions) => {
+  const showNotification = useCallback(async (options: AppNotificationOptions) => {
     await notificationService.showNotification(options);
   }, []);
 

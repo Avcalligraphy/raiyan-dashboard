@@ -1,10 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import {
-  blogTagService,
-  type BlogTag,
-  type CreateBlogTagInput,
-  type UpdateBlogTagInput,
-} from '@/services/blogTagService'
+import { blogTagService, type CreateBlogTagInput, type UpdateBlogTagInput } from '@/services/blogTagService'
 
 export const blogTagKeys = {
   all: ['blogTags'] as const,

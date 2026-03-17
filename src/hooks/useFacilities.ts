@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { facilityService, type Facility, type CreateFacilityInput, type UpdateFacilityInput } from '@/services/facilityService'
+import { facilityService, type CreateFacilityInput, type UpdateFacilityInput } from '@/services/facilityService'
 
 /**
  * Query key factory for facilities

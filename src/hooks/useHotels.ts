@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { hotelService, type Hotel, type CreateHotelInput, type UpdateHotelInput } from '@/services/hotelService'
+import { hotelService, type CreateHotelInput, type UpdateHotelInput } from '@/services/hotelService'
 
 /**
  * Query key factory for hotels

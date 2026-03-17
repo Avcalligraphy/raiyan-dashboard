@@ -1,5 +1,10 @@
-// Notification Service for PWA
-export interface NotificationOptions {
+// Notification Service for PWA (use custom name to avoid conflict with DOM NotificationOptions)
+export interface NotificationAction {
+  action: string;
+  title: string;
+}
+
+export interface AppNotificationOptions {
   title: string;
   body: string;
   icon?: string;
@@ -58,7 +63,7 @@ class NotificationService {
   /**
    * Show a notification
    */
-  async showNotification(options: NotificationOptions): Promise<void> {
+  async showNotification(options: AppNotificationOptions): Promise<void> {
     if (!this.isSupported()) {
       console.warn('Notifications are not supported');
       return;
@@ -76,17 +81,19 @@ class NotificationService {
     if ('serviceWorker' in navigator) {
       try {
         const registration = await navigator.serviceWorker.ready;
-        
-        await registration.showNotification(options.title, {
+        const showOpts = {
           body: options.body,
           icon: options.icon || '/pwa-192x192.png',
           badge: options.badge || '/pwa-192x192.png',
           tag: options.tag,
           data: options.data,
           requireInteraction: options.requireInteraction || false,
-          actions: options.actions || [],
-          vibrate: [200, 100, 200],
-        });
+          vibrate: [200, 100, 200] as const,
+          ...(options.actions?.length
+            ? { actions: options.actions.map((a) => ({ action: a.action, title: a.title })) }
+            : {}),
+        };
+        await registration.showNotification(options.title, showOpts as NotificationOptions);
       } catch (error) {
         console.error('Error showing notification:', error);
         // Fallback to browser notification if service worker fails
@@ -128,7 +135,4 @@ class NotificationService {
 }
 
 export const notificationService = new NotificationService();
-
-// Explicit type export for better module resolution
-export type { NotificationOptions };
 

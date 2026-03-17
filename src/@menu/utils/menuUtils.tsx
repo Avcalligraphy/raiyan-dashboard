@@ -43,7 +43,7 @@ export const confirmUrlInChildren = (children: ChildrenType['children'], url: st
   }
 
   if (isValidElement(children)) {
-    const { component, href, exactMatch, activeUrl, children: subChildren } = children.props
+    const { component, href, exactMatch, activeUrl, children: subChildren } = (children as any).props
 
     if (component && component.props.href) {
       return exactMatch === true || exactMatch === undefined
@@ -85,7 +85,11 @@ const processMenuChildren = (children: ReactNode, mapFunction: (child: ReactNode
 
     // If child has menuData prop, create a GenerateVerticalMenu component
     // Otherwise, apply the transformation function to the child
-    return child.props?.menuData ? <GenerateVerticalMenu menuData={child.props.menuData} /> : mapFunction(child)
+    return (child as any).props?.menuData ? (
+      <GenerateVerticalMenu menuData={(child as any).props.menuData} />
+    ) : (
+      mapFunction(child)
+    )
   })
 }
 
@@ -102,7 +106,7 @@ export const mapHorizontalToVerticalMenu = (children: ReactNode): ReactNode => {
     if (!isValidElement(child)) return null
 
     // Destructure to separate specific props and rest props for further use
-    const { children: childChildren, verticalMenuProps, ...rest } = child.props
+    const { children: childChildren, verticalMenuProps, ...rest } = (child as any).props
 
     // Use a switch statement to handle different types of menu items
     switch (child.type) {

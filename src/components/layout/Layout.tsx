@@ -27,8 +27,6 @@ import PWAInstallPrompt from '@components/common/PWAInstallPrompt'
 import { getMode } from '@core/utils/clientHelpers'
 
 const Layout = () => {
-  // Vars
-  const direction = 'ltr'
   const mode = getMode() as Mode
 
   return (

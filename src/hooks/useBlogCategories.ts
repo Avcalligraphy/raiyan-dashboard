@@ -1,10 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import {
-  blogCategoryService,
-  type BlogCategory,
-  type CreateBlogCategoryInput,
-  type UpdateBlogCategoryInput,
-} from '@/services/blogCategoryService'
+import { blogCategoryService, type CreateBlogCategoryInput, type UpdateBlogCategoryInput } from '@/services/blogCategoryService'
 
 /**
  * Query key factory for blog categories

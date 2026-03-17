@@ -1,9 +1,6 @@
 // React Imports
 import type { ReactNode } from 'react'
 
-// React Router Imports
-import type { LinkProps } from 'react-router-dom'
-
 // MUI Imports
 import type { IconButtonProps } from '@mui/material/IconButton'
 import type { MenuItemProps } from '@mui/material/MenuItem'
@@ -24,7 +21,7 @@ export type OptionMenuItemType = {
   text: ReactNode
   icon?: ReactNode
   linkProps?: BoxProps<'a'>
-  href?: LinkProps['href']
+  href?: string
   menuItemProps?: MenuItemProps
   divider?: never
   dividerProps?: never

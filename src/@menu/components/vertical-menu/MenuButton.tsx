@@ -79,7 +79,7 @@ const MenuButton: ForwardRefRenderFunction<HTMLAnchorElement, MenuButtonProps> =
       )
     } else {
       // Otherwise, clone the element
-      const { className: classNameProp, ...props } = component.props
+      const { className: classNameProp, ...props } = (component as any).props || {}
 
       return cloneElement(
         component,

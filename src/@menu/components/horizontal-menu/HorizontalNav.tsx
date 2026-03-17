@@ -2,7 +2,7 @@
 
 // React Imports
 import { useEffect, useRef } from 'react'
-import type { HTMLAttributes } from 'react'
+import type { HTMLAttributes, JSX } from 'react'
 
 // Third-party Imports
 import classnames from 'classnames'

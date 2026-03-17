@@ -24,7 +24,6 @@ import { useForm, Controller } from "react-hook-form";
 
 // Type Imports
 import type { User, Role } from "@/types/userTypes";
-import type { UpdateUserPayload, RegisterUserPayload } from "@/types/userTypes";
 import { userService, roleService } from "@/services/userService";
 
 type Props = {
@@ -77,7 +76,6 @@ const AddUserDrawer = (props: Props) => {
 
   const control = isEditMode ? editForm.control : addForm.control;
   const errors = isEditMode ? editForm.formState.errors : addForm.formState.errors;
-  const resetForm = isEditMode ? editForm.reset : addForm.reset;
 
   useEffect(() => {
     if (open) {
@@ -202,7 +200,7 @@ const AddUserDrawer = (props: Props) => {
 
             <Controller
               name="full_name"
-              control={control}
+              control={control as any}
               rules={{ required: "Full name is required" }}
               render={({ field }) => (
                 <TextField
@@ -218,7 +216,7 @@ const AddUserDrawer = (props: Props) => {
 
             <Controller
               name="email"
-              control={control}
+              control={control as any}
               rules={{
                 required: "Email is required",
                 pattern: {
@@ -269,7 +267,7 @@ const AddUserDrawer = (props: Props) => {
               <InputLabel id="user-role-label">Role</InputLabel>
               <Controller
                 name="role_id"
-                control={control}
+                control={control as any}
                 render={({ field }) => (
                   <Select
                     {...field}

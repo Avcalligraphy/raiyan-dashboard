@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 // Type Imports
-import type { ChildrenType, Direction, SystemMode } from '@core/types'
+import type { ChildrenType, Direction, Mode, SystemMode } from '@core/types'
 
 // Context Imports
 import { VerticalNavProvider } from '@menu/contexts/verticalNavContext'
@@ -41,13 +41,13 @@ const Providers = (props: Props) => {
   const { children, direction } = props
 
   // State
-  const [mode, setMode] = useState<string>('system')
+  const [mode, setMode] = useState<Mode>('system')
   const [settingsCookie, setSettingsCookie] = useState<Record<string, any>>({})
   const [systemMode, setSystemMode] = useState<SystemMode>('light')
 
   // Initialize on mount
   useEffect(() => {
-    setMode(getMode())
+    setMode(getMode() as Mode)
     setSettingsCookie(getSettingsFromCookie())
     setSystemMode(getSystemMode())
   }, [])
