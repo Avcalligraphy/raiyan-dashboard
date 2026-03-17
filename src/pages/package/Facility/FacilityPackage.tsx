@@ -136,11 +136,18 @@ const FacilityPackagesPage = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm("Are you sure you want to delete this facility?")) {
+    if (
+      window.confirm(
+        "Hapus facility ini? Jika facility dipakai di paket, slot facility di paket tersebut akan dikosongkan (bukan paket dihapus)."
+      )
+    ) {
       try {
         await deleteFacility.mutateAsync(id);
+        alert("Facility berhasil dihapus.");
       } catch (error) {
-        console.error("Failed to delete facility:", error);
+        const message =
+          error instanceof Error ? error.message : "Gagal menghapus facility.";
+        alert(message);
       }
     }
   };

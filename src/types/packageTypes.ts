@@ -5,13 +5,20 @@
 export type PackageStatus = 'Available' | 'Full' | 'Coming Soon'
 export type PackageCategory = 'Reguler' | 'Premium' | 'Berbakti' | 'Ramadhan' | string
 
+/** One day in the package itinerary (e.g. Hari 1, Hari 2). */
+export type ItineraryDay = {
+  day: number
+  title?: string
+  description?: string
+}
+
 export type Package = {
   id: string
   name: string
   category: PackageCategory
   price: number
   duration_days: number
-  itinerary: string
+  itinerary: ItineraryDay[]
   status: PackageStatus
   badge: string
   thumbnail_url?: string | null
@@ -43,11 +50,25 @@ export type PackageGalleryItem = {
   created_at?: string
 }
 
+export type PackageHotelLink = {
+  package_id?: string
+  hotel_id: string
+  hotel_type: 'makkah' | 'madinah'
+  hotel?: { id: string; name: string; city: string; star_rating: number; address?: string }
+}
+
+export type PackageFacilityLink = {
+  package_id?: string
+  facility_id: string
+  facility_type: 'included' | 'excluded'
+  facility?: { id: string; name: string; description?: string }
+}
+
 export type PackageWithRelations = {
   package: Package
   departures: PackageDeparture[]
-  hotels: Array<{ package_id: string; hotel_id: string; hotel_type: string; hotel: unknown }>
-  facilities: Array<{ package_id: string; facility_id: string; facility_type: string; facility: unknown }>
+  hotels: PackageHotelLink[]
+  facilities: PackageFacilityLink[]
   gallery: PackageGalleryItem[]
 }
 
@@ -56,7 +77,7 @@ export type CreatePackagePayload = {
   category: string
   price: number
   duration_days: number
-  itinerary: string
+  itinerary: ItineraryDay[]
   status: PackageStatus
   badge: string
   slug: string
@@ -95,7 +116,7 @@ export type PackageFormState = {
   category: string
   price: number
   duration_days: number
-  itinerary: string
+  itinerary: ItineraryDay[]
   status: PackageStatus
   badge: string
   slug: string
@@ -105,6 +126,8 @@ export type PackageFormState = {
   thumbnail_url: string
   departures: Array<{ departure_date: string; quota: number; remaining_quota: number }>
   gallery: Array<{ media_url: string }>
+  hotels: Array<{ hotel_id: string; hotel_type: 'makkah' | 'madinah' }>
+  facilities: Array<{ facility_id: string; facility_type: 'included' | 'excluded' }>
 }
 
 export const initialPackageFormState: PackageFormState = {
@@ -112,7 +135,7 @@ export const initialPackageFormState: PackageFormState = {
   category: 'Reguler',
   price: 0,
   duration_days: 9,
-  itinerary: '',
+  itinerary: [],
   status: 'Available',
   badge: '',
   slug: '',
@@ -121,18 +144,21 @@ export const initialPackageFormState: PackageFormState = {
   meta_description: '',
   thumbnail_url: '',
   departures: [],
-  gallery: []
+  gallery: [],
+  hotels: [],
+  facilities: []
 }
 
 /** Map API package with relations to form state for edit. */
 export function packageWithRelationsToFormState(data: PackageWithRelations): PackageFormState {
   const p = data.package
+  const itinerary = Array.isArray(p.itinerary) ? p.itinerary : []
   return {
     name: p.name,
     category: p.category,
     price: p.price,
     duration_days: p.duration_days,
-    itinerary: p.itinerary ?? '',
+    itinerary,
     status: p.status,
     badge: p.badge ?? '',
     slug: p.slug,
@@ -146,5 +172,15 @@ export function packageWithRelationsToFormState(data: PackageWithRelations): Pac
       remaining_quota: d.remaining_quota,
     })),
     gallery: (data.gallery ?? []).map((g) => ({ media_url: g.media_url })),
+    hotels: (data.hotels ?? []).map((h) => ({
+      hotel_id: h.hotel_id,
+      hotel_type: (h.hotel_type === 'madinah' ? 'madinah' : 'makkah') as 'makkah' | 'madinah',
+    })),
+    facilities: (data.facilities ?? []).map((f) => ({
+      facility_id: f.facility_id,
+      facility_type: (f.facility_type === 'excluded' ? 'excluded' : 'included') as
+        | 'included'
+        | 'excluded',
+    })),
   }
 }

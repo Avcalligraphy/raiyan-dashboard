@@ -8,6 +8,7 @@ import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
 import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -130,46 +131,57 @@ const PackageImage = ({ form, onChange }: PackageImageProps) => {
           )}
 
           {thumbnailUrl ? (
-            <div className="mts-4 flex items-center gap-3 flex-wrap">
-              <div className="relative">
-                <img
-                  src={thumbnailUrl.startsWith("http") ? thumbnailUrl : `${getApiUrl()}${thumbnailUrl}`}
-                  alt="Thumbnail"
-                  className="rounded border"
-                  style={{ maxWidth: 160, maxHeight: 120, objectFit: "cover" }}
-                />
-                <IconButton
+            <div className="mts-6">
+              <Typography variant="subtitle2" color="text.secondary" className="mbe-2">
+                Current thumbnail
+              </Typography>
+              <div className="flex items-start gap-4 flex-wrap">
+                <div className="relative shrink-0">
+                  <img
+                    src={thumbnailUrl.startsWith("http") ? thumbnailUrl : `${getApiUrl()}${thumbnailUrl}`}
+                    alt="Thumbnail"
+                    className="rounded border"
+                    style={{ maxWidth: 160, maxHeight: 120, objectFit: "cover" }}
+                  />
+                  <IconButton
+                    size="small"
+                    onClick={handleRemoveThumbnail}
+                    sx={{
+                      position: "absolute",
+                      top: 4,
+                      right: 4,
+                      bgcolor: "background.paper",
+                      "&:hover": { bgcolor: "action.hover" },
+                    }}
+                  >
+                    <i className="ri-close-line text-xl" />
+                  </IconButton>
+                </div>
+                <Button
+                  color="error"
+                  variant="outlined"
                   size="small"
                   onClick={handleRemoveThumbnail}
-                  sx={{
-                    position: "absolute",
-                    top: 4,
-                    right: 4,
-                    bgcolor: "background.paper",
-                    "&:hover": { bgcolor: "action.hover" },
-                  }}
+                  className="self-center"
                 >
-                  <i className="ri-close-line text-xl" />
-                </IconButton>
+                  Remove thumbnail
+                </Button>
               </div>
-              <Button
-                color="error"
-                variant="outlined"
-                size="small"
-                onClick={handleRemoveThumbnail}
-              >
-                Remove thumbnail
-              </Button>
             </div>
           ) : null}
+
+          {thumbnailUrl ? (
+            <Divider className="mbs-6 mbe-4" />
+          ) : (
+            <div className="mts-6" />
+          )}
 
           <TextField
             fullWidth
             label="Thumbnail URL (optional)"
-            placeholder="https://… or upload above"
+            placeholder="https://… or paste URL here"
             value={form.thumbnail_url}
             onChange={(e) => onChange({ thumbnail_url: e.target.value })}
-            className="mts-4"
           />
         </CardContent>
       </Card>

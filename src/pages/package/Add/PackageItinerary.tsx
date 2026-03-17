@@ -1,77 +1,112 @@
 // React Imports
-import { useState } from "react";
-import type { SyntheticEvent } from "react";
+import { useCallback, useMemo } from "react";
 
 // MUI Imports
-import Grid from "@mui/material/Grid2";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
 import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
+import Grid from "@mui/material/Grid2";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
 
-// Components Imports
-import CustomIconButton from "@core/components/mui/IconButton";
+// Type Imports
+import type { ItineraryDay } from "@/types/packageTypes";
+import type { PackageFormState } from "@/types/packageTypes";
 
-const PackageItinerary = () => {
-  // States
-  const [count, setCount] = useState(1);
+type PackageItineraryProps = {
+  form: Pick<PackageFormState, "itinerary">;
+  onChange: (patch: Partial<PackageFormState>) => void;
+};
 
-  const deleteForm = (e: SyntheticEvent) => {
-    e.preventDefault();
+const PackageItinerary = ({ form, onChange }: PackageItineraryProps) => {
+  const itinerary = useMemo(() => form.itinerary ?? [], [form.itinerary]);
 
-    // @ts-expect-error
-    e.target.closest(".repeater-item").remove();
-  };
+  const updateDay = useCallback(
+    (index: number, patch: Partial<ItineraryDay>) => {
+      const next = [...itinerary];
+      next[index] = { ...next[index], ...patch };
+      onChange({ itinerary: next });
+    },
+    [itinerary, onChange],
+  );
+
+  const addDay = useCallback(() => {
+    const dayNumber = itinerary.length + 1;
+    onChange({
+      itinerary: [...itinerary, { day: dayNumber, title: `Hari ${dayNumber}`, description: "" }],
+    });
+  }, [itinerary, onChange]);
+
+  const removeDay = useCallback(
+    (index: number) => {
+      const next = itinerary.filter((_, i) => i !== index);
+      // Re-number days
+      const renumbered = next.map((d, i) => ({ ...d, day: i + 1, title: d.title || `Hari ${i + 1}` }));
+      onChange({ itinerary: renumbered });
+    },
+    [itinerary, onChange],
+  );
 
   return (
     <Card>
-      <CardHeader title="Variants" />
+      <CardHeader
+        title="Itinerary"
+        subheader="Rencana per hari (Hari 1, Hari 2, …). Tambah atau hapus hari sesuai kebutuhan."
+      />
       <CardContent>
-        <Grid container spacing={6}>
-          {Array.from(Array(count).keys()).map((item, index) => (
+        <Grid container spacing={4}>
+          {itinerary.map((day, index) => (
             <Grid key={index} size={{ xs: 12 }} className="repeater-item">
-              <Grid container spacing={6}>
-                <Grid size={{ xs: 12, sm: 4 }}>
-                  <FormControl fullWidth>
-                    <InputLabel>Select Variant</InputLabel>
-                    <Select label="Select Variant" defaultValue="Size">
-                      <MenuItem value="Size">Size</MenuItem>
-                      <MenuItem value="Color">Color</MenuItem>
-                      <MenuItem value="Weight">Weight</MenuItem>
-                      <MenuItem value="Smell">Smell</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid size={{ xs: 12, sm: 8 }}>
-                  <div className="flex items-center gap-6">
+              <Card variant="outlined" sx={{ p: 2 }}>
+                <div className="flex items-start justify-between gap-2 mbe-2">
+                  <Typography variant="subtitle1" fontWeight="600">
+                    Hari {day.day}
+                  </Typography>
+                  <IconButton
+                    size="small"
+                    color="error"
+                    onClick={() => removeDay(index)}
+                    aria-label="Hapus hari"
+                  >
+                    <i className="ri-close-line" />
+                  </IconButton>
+                </div>
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 12 }}>
                     <TextField
                       fullWidth
-                      label="Variant Value"
-                      placeholder="Enter Variant Value"
+                      size="small"
+                      label="Judul (opsional)"
+                      placeholder={`Hari ${day.day}`}
+                      value={day.title ?? ""}
+                      onChange={(e) => updateDay(index, { title: e.target.value })}
                     />
-                    <CustomIconButton
-                      onClick={deleteForm}
-                      className="min-is-fit"
-                    >
-                      <i className="ri-close-line" />
-                    </CustomIconButton>
-                  </div>
+                  </Grid>
+                  <Grid size={{ xs: 12 }}>
+                    <TextField
+                      fullWidth
+                      multiline
+                      minRows={2}
+                      size="small"
+                      label="Aktivitas / deskripsi"
+                      placeholder="Contoh: Soekarno Hatta (CGK) – Jeddah (JED), lalu ke hotel Madinah dengan bus"
+                      value={day.description ?? ""}
+                      onChange={(e) => updateDay(index, { description: e.target.value })}
+                    />
+                  </Grid>
                 </Grid>
-              </Grid>
+              </Card>
             </Grid>
           ))}
           <Grid size={{ xs: 12 }}>
             <Button
               variant="contained"
-              onClick={() => setCount(count + 1)}
+              onClick={addDay}
               startIcon={<i className="ri-add-line" />}
             >
-              Add Another Option
+              Tambah hari
             </Button>
           </Grid>
         </Grid>

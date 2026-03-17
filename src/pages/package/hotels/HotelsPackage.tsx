@@ -136,11 +136,18 @@ const HotelsPackagesPage = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm("Are you sure you want to delete this hotel?")) {
+    if (
+      window.confirm(
+        "Hapus hotel ini? Jika hotel dipakai di paket, slot hotel di paket tersebut akan dikosongkan (bukan paket dihapus)."
+      )
+    ) {
       try {
         await deleteHotel.mutateAsync(id);
+        alert("Hotel berhasil dihapus.");
       } catch (error) {
-        console.error("Failed to delete hotel:", error);
+        const message =
+          error instanceof Error ? error.message : "Gagal menghapus hotel.";
+        alert(message);
       }
     }
   };

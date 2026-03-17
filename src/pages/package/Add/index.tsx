@@ -11,7 +11,10 @@ import Grid from "@mui/material/Grid2";
 import PackageAddHeader from "./PackageAddHeader";
 import PackageInformation from "./PackageInformation";
 import PackageImage from "./PackageImage";
+import PackageItinerary from "./PackageItinerary";
 import PackageDepartures from "./PackageDepartures";
+import PackageHotels from "./PackageHotels";
+import PackageFacilities from "./PackageFacilities";
 import PackagePricing from "./PackagePricing";
 
 // Service Imports
@@ -40,7 +43,7 @@ const PackageAdd = () => {
       category: form.category,
       price: form.price,
       duration_days: form.duration_days,
-      itinerary: form.itinerary || "",
+      itinerary: form.itinerary ?? [],
       status: form.status,
       badge: form.badge.trim(),
       slug: form.slug.trim(),
@@ -76,7 +79,18 @@ const PackageAdd = () => {
       setSubmitError(null);
       try {
         const payload = buildPayload(is_published);
-        await packageService.create(payload);
+        const created = await packageService.create(payload);
+        const packageId = created.id;
+        for (const h of form.hotels ?? []) {
+          if (h.hotel_id) {
+            await packageService.addHotelToPackage(packageId, h.hotel_id, h.hotel_type);
+          }
+        }
+        for (const f of form.facilities ?? []) {
+          if (f.facility_id) {
+            await packageService.addFacilityToPackage(packageId, f.facility_id, f.facility_type);
+          }
+        }
         navigate("/package/list", { replace: true });
       } catch (err) {
         setSubmitError(
@@ -86,7 +100,7 @@ const PackageAdd = () => {
         setIsSubmitting(false);
       }
     },
-    [form.name, form.slug, buildPayload, navigate],
+    [form.name, form.slug, form.hotels, form.facilities, buildPayload, navigate],
   );
 
   const handleDiscard = useCallback(() => {
@@ -121,12 +135,21 @@ const PackageAdd = () => {
             <PackageImage form={form} onChange={onChange} />
           </Grid>
           <Grid size={{ xs: 12 }}>
+            <PackageItinerary form={form} onChange={onChange} />
+          </Grid>
+          <Grid size={{ xs: 12 }}>
             <PackageDepartures form={form} onChange={onChange} />
           </Grid>
         </Grid>
       </Grid>
       <Grid size={{ xs: 12, md: 4 }}>
         <Grid container spacing={6}>
+          <Grid size={{ xs: 12 }}>
+            <PackageHotels form={form} onChange={onChange} />
+          </Grid>
+          <Grid size={{ xs: 12 }}>
+            <PackageFacilities form={form} onChange={onChange} />
+          </Grid>
           <Grid size={{ xs: 12 }}>
             <PackagePricing form={form} onChange={onChange} />
           </Grid>

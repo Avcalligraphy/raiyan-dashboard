@@ -80,8 +80,23 @@ export async function apiFetch(
 
 /**
  * Convenience: apiFetch then response.json().
+ * For 204 No Content (e.g. DELETE success) returns undefined without parsing body.
+ * For non-2xx responses, parses error body and throws Error with message.
  */
 export async function apiFetchJson<T>(path: string, options: RequestInit = {}): Promise<T> {
   const res = await apiFetch(path, options)
+  if (res.status === 204 || res.headers.get('content-length') === '0') {
+    return undefined as T
+  }
+  if (!res.ok) {
+    let message = res.statusText
+    try {
+      const body = await res.json() as { error?: string; message?: string }
+      message = body.error ?? body.message ?? message
+    } catch {
+      // ignore parse error
+    }
+    throw new Error(message)
+  }
   return res.json() as Promise<T>
 }

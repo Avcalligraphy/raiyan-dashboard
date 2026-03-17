@@ -11,7 +11,10 @@ import Grid from "@mui/material/Grid2";
 import PackageAddHeader from "../Add/PackageAddHeader";
 import PackageInformation from "../Add/PackageInformation";
 import PackageImage from "../Add/PackageImage";
+import PackageItinerary from "../Add/PackageItinerary";
 import PackageDepartures from "../Add/PackageDepartures";
+import PackageHotels from "../Add/PackageHotels";
+import PackageFacilities from "../Add/PackageFacilities";
 import PackagePricing from "../Add/PackagePricing";
 
 // Service Imports
@@ -63,7 +66,7 @@ const PackageEdit = () => {
       category: form.category,
       price: form.price,
       duration_days: form.duration_days,
-      itinerary: form.itinerary || "",
+      itinerary: form.itinerary ?? [],
       status: form.status,
       badge: form.badge.trim(),
       slug: form.slug.trim(),
@@ -100,6 +103,23 @@ const PackageEdit = () => {
       try {
         const payload = buildPayload(is_published);
         await packageService.update(id, payload);
+        const relations = await packageService.getWithRelations(id);
+        for (const h of relations.hotels ?? []) {
+          await packageService.removeHotelFromPackage(id, h.hotel_id, h.hotel_type);
+        }
+        for (const f of relations.facilities ?? []) {
+          await packageService.removeFacilityFromPackage(id, f.facility_id, f.facility_type);
+        }
+        for (const h of form.hotels ?? []) {
+          if (h.hotel_id) {
+            await packageService.addHotelToPackage(id, h.hotel_id, h.hotel_type);
+          }
+        }
+        for (const f of form.facilities ?? []) {
+          if (f.facility_id) {
+            await packageService.addFacilityToPackage(id, f.facility_id, f.facility_type);
+          }
+        }
         navigate("/package/list", { replace: true });
       } catch (err) {
         setSubmitError(
@@ -109,7 +129,7 @@ const PackageEdit = () => {
         setIsSubmitting(false);
       }
     },
-    [id, form.name, form.slug, buildPayload, navigate],
+    [id, form.name, form.slug, form.hotels, form.facilities, buildPayload, navigate],
   );
 
   const handleDiscard = useCallback(() => {
@@ -162,12 +182,21 @@ const PackageEdit = () => {
             <PackageImage form={form} onChange={onChange} />
           </Grid>
           <Grid size={{ xs: 12 }}>
+            <PackageItinerary form={form} onChange={onChange} />
+          </Grid>
+          <Grid size={{ xs: 12 }}>
             <PackageDepartures form={form} onChange={onChange} />
           </Grid>
         </Grid>
       </Grid>
       <Grid size={{ xs: 12, md: 4 }}>
         <Grid container spacing={6}>
+          <Grid size={{ xs: 12 }}>
+            <PackageHotels form={form} onChange={onChange} />
+          </Grid>
+          <Grid size={{ xs: 12 }}>
+            <PackageFacilities form={form} onChange={onChange} />
+          </Grid>
           <Grid size={{ xs: 12 }}>
             <PackagePricing form={form} onChange={onChange} />
           </Grid>

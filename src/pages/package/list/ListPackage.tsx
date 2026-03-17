@@ -1,5 +1,5 @@
 // React Imports
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 // MUI Imports
 import Grid from "@mui/material/Grid2";
@@ -24,7 +24,7 @@ const ListPackage = () => {
     is_published?: boolean;
   }>({});
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       const res = await packageService.list({
@@ -40,11 +40,11 @@ const ListPackage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [listParams]);
 
   useEffect(() => {
     load();
-  }, [listParams]);
+  }, [load]);
 
   const onFiltersChange = (params: {
     category?: string;
@@ -54,9 +54,14 @@ const ListPackage = () => {
     setListParams(params);
   };
 
-  const onDeleted = () => {
-    load();
-  };
+  const onDeleted = useCallback(
+    (deletedId: string) => {
+      setPackages((prev) => prev.filter((p) => p.id !== deletedId));
+      setTotal((prev) => Math.max(0, prev - 1));
+      load();
+    },
+    [load],
+  );
 
   return (
     <Grid container spacing={6}>

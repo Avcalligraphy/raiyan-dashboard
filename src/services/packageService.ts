@@ -73,5 +73,61 @@ export const packageService = {
     await apiFetchJson(`/api/packages/${id}`, {
       method: 'DELETE'
     })
+  },
+
+  /**
+   * Add hotel to package (CMS, packages.write). hotel_type: makkah | madinah.
+   */
+  addHotelToPackage: async (
+    packageId: string,
+    hotelId: string,
+    hotelType: 'makkah' | 'madinah'
+  ): Promise<{ package_id: string; hotel_id: string; hotel_type: string }> => {
+    return apiFetchJson(`/api/packages/${packageId}/hotels`, {
+      method: 'POST',
+      body: JSON.stringify({ hotel_id: hotelId, hotel_type: hotelType })
+    })
+  },
+
+  /**
+   * Remove hotel from package (CMS, packages.write).
+   */
+  removeHotelFromPackage: async (
+    packageId: string,
+    hotelId: string,
+    hotelType: string
+  ): Promise<void> => {
+    const params = new URLSearchParams({ hotel_id: hotelId, hotel_type: hotelType })
+    await apiFetchJson(`/api/packages/${packageId}/hotels?${params}`, {
+      method: 'DELETE'
+    })
+  },
+
+  /**
+   * Add facility to package (CMS, packages.write). facility_type: included | excluded.
+   */
+  addFacilityToPackage: async (
+    packageId: string,
+    facilityId: string,
+    facilityType: 'included' | 'excluded'
+  ): Promise<{ package_id: string; facility_id: string; facility_type: string }> => {
+    return apiFetchJson(`/api/packages/${packageId}/facilities`, {
+      method: 'POST',
+      body: JSON.stringify({ facility_id: facilityId, facility_type: facilityType })
+    })
+  },
+
+  /**
+   * Remove facility from package (CMS, packages.write).
+   */
+  removeFacilityFromPackage: async (
+    packageId: string,
+    facilityId: string,
+    facilityType: string
+  ): Promise<void> => {
+    const params = new URLSearchParams({ facility_id: facilityId, facility_type: facilityType })
+    await apiFetchJson(`/api/packages/${packageId}/facilities?${params}`, {
+      method: 'DELETE'
+    })
   }
 }

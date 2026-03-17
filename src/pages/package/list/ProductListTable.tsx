@@ -99,7 +99,7 @@ type ProductListTableProps = {
     status?: string;
     is_published?: boolean;
   }) => void;
-  onDeleted: () => void;
+  onDeleted: (deletedId: string) => void;
 };
 
 const ProductListTable = ({
@@ -221,7 +221,7 @@ const ProductListTable = ({
                         setDeletingId(id);
                         try {
                           await packageService.delete(id);
-                          onDeleted();
+                          onDeleted(id);
                         } finally {
                           setDeletingId(null);
                         }
