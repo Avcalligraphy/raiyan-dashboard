@@ -136,7 +136,7 @@ const UserDropdown = () => {
                     </div>
                   </div>
                   <Divider className="mlb-1" />
-                  <MenuItem
+                  {/* <MenuItem
                     className="gap-3 pli-4"
                     onClick={(e) => handleDropdownClose(e)}
                   >
@@ -163,7 +163,7 @@ const UserDropdown = () => {
                   >
                     <i className="ri-question-line" />
                     <Typography color="text.primary">FAQ</Typography>
-                  </MenuItem>
+                  </MenuItem> */}
                   <div className="flex items-center plb-1.5 pli-4">
                     <Button
                       fullWidth

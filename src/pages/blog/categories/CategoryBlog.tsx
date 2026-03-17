@@ -200,10 +200,21 @@ const CategoryBlogPage = () => {
                   onClick={() => {
                     if (
                       window.confirm(
-                        `Are you sure you want to delete "${row.original.name}"?`
+                        `Hapus kategori "${row.original.name}"? Post yang menggunakan kategori ini akan kehilangan kategorinya (bukan post dihapus).`
                       )
                     ) {
-                      deleteCategory.mutate(row.original.id);
+                      deleteCategory.mutate(row.original.id, {
+                        onSuccess: () => {
+                          alert("Kategori berhasil dihapus.");
+                        },
+                        onError: (error) => {
+                          const message =
+                            error instanceof Error
+                              ? error.message
+                              : "Gagal menghapus kategori.";
+                          alert(message);
+                        },
+                      });
                     }
                   }}
                 >

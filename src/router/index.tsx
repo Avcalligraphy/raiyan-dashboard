@@ -7,7 +7,7 @@ import ListPackagesPage from "../pages/package/list/ListPackage";
 import HotelsPackagesPage from "@/pages/package/hotels/HotelsPackage";
 import FacilityPackagesPage from "@/pages/package/Facility/FacilityPackage";
 import UserManagementPage from "@/pages/user/UserManagement";
-import TestimonialsPage from "@/pages/Testimonials";
+import TestimonialsPage from "@/pages/testimonials";
 import CategoryBlogPage from "@/pages/blog/categories/CategoryBlog";
 import TagsBlogPage from "@/pages/blog/tags/TagsBlog";
 

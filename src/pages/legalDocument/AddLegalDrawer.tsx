@@ -144,7 +144,11 @@ const AddLegalDrawer = (props: Props) => {
         is_active: data.is_active,
       };
       if (fileUrl.trim()) payload.file_url = fileUrl.trim();
-      if (data.issued_date.trim()) payload.issued_date = data.issued_date.trim();
+      // Backend expects RFC3339 for issued_date; date input gives YYYY-MM-DD
+      if (data.issued_date.trim()) {
+        const d = data.issued_date.trim();
+        payload.issued_date = d.length === 10 ? `${d}T00:00:00Z` : d;
+      }
 
       if (isEditMode && document) {
         await legalDocumentService.update(document.id, payload);

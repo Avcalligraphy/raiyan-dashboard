@@ -1,7 +1,7 @@
 'use client'
 
 // React Imports
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
 // MUI Imports
 import Box from '@mui/material/Box'
@@ -29,6 +29,8 @@ import type { Testimonial, TestimonialMediaType, CreateTestimonialPayload } from
 
 // Service Imports
 import { testimonialService } from '@/services/testimonialService'
+import { uploadFile } from '@/services/uploadService'
+import { getApiUrl } from '@/services/apiClient'
 
 type Props = {
   open: boolean
@@ -51,6 +53,7 @@ const AddTestimonialDrawer = (props: Props) => {
     control,
     watch,
     reset,
+    setValue,
     handleSubmit,
     formState: { errors },
   } = useForm<CreateTestimonialPayload>({
@@ -93,6 +96,35 @@ const AddTestimonialDrawer = (props: Props) => {
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [uploadingMedia, setUploadingMedia] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const mediaUrl = watch('media_url')
+
+  const handleChooseFile = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleMediaFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setError(null)
+    setUploadingMedia(true)
+    try {
+      const { url } = await uploadFile(file, 'testimonials')
+      setValue('media_url', url, { shouldValidate: true })
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Upload failed.')
+    } finally {
+      setUploadingMedia(false)
+      e.target.value = ''
+    }
+  }
+
+  const resolveMediaUrl = (url: string) => {
+    if (!url?.trim()) return ''
+    return url.startsWith('http') ? url : `${getApiUrl()}${url}`
+  }
 
   const onSubmit = async (data: CreateTestimonialPayload) => {
     setError(null)
@@ -236,21 +268,76 @@ const AddTestimonialDrawer = (props: Props) => {
             />
 
             {(mediaType === 'video' || mediaType === 'image') && (
-              <Controller
-                name="media_url"
-                control={control}
-                rules={{ required: 'Media URL is required for video/image' }}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    fullWidth
-                    label="Media URL"
-                    placeholder="https://..."
-                    error={!!errors.media_url}
-                    helperText={errors.media_url?.message}
-                  />
-                )}
-              />
+              <>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  accept={mediaType === 'image' ? 'image/jpeg,image/png,image/webp,image/gif' : 'video/mp4,video/webm,video/ogg'}
+                  style={{ display: 'none' }}
+                  onChange={handleMediaFileChange}
+                />
+                <Controller
+                  name="media_url"
+                  control={control}
+                  rules={{ required: 'Media URL is required for video/image' }}
+                  render={({ field }) => (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                      <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+                        <TextField
+                          {...field}
+                          fullWidth
+                          label="Media URL"
+                          placeholder="https://... or upload file"
+                          error={!!errors.media_url}
+                          helperText={errors.media_url?.message}
+                          size="small"
+                        />
+                        <Button
+                          type="button"
+                          variant="outlined"
+                          size="medium"
+                          onClick={handleChooseFile}
+                          disabled={uploadingMedia}
+                          startIcon={uploadingMedia ? <CircularProgress size={16} /> : <i className="ri-upload-2-line" />}
+                          sx={{ minWidth: 120, flexShrink: 0 }}
+                        >
+                          {uploadingMedia ? 'Uploading…' : 'Choose file'}
+                        </Button>
+                      </Box>
+                      {mediaUrl?.trim() && (
+                        <Box
+                          sx={{
+                            mt: 1,
+                            p: 1.5,
+                            borderRadius: 1,
+                            bgcolor: 'action.hover',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            minHeight: 120,
+                          }}
+                        >
+                          {mediaType === 'image' ? (
+                            <img
+                              src={resolveMediaUrl(mediaUrl)}
+                              alt="Preview"
+                              style={{ maxWidth: '100%', maxHeight: 200, objectFit: 'contain', borderRadius: 4 }}
+                            />
+                          ) : (
+                            <video
+                              src={resolveMediaUrl(mediaUrl)}
+                              controls
+                              style={{ maxWidth: '100%', maxHeight: 200, borderRadius: 4 }}
+                            >
+                              Your browser does not support the video tag.
+                            </video>
+                          )}
+                        </Box>
+                      )}
+                    </Box>
+                  )}
+                />
+              </>
             )}
 
             <Controller

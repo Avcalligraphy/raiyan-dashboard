@@ -178,10 +178,21 @@ const TagsBlogPage = () => {
                   onClick={() => {
                     if (
                       window.confirm(
-                        `Are you sure you want to delete "${row.original.name}"?`
+                        `Hapus tag "${row.original.name}"? Post yang menggunakan tag ini akan kehilangan tag tersebut (bukan post dihapus).`
                       )
                     ) {
-                      deleteTag.mutate(row.original.id);
+                      deleteTag.mutate(row.original.id, {
+                        onSuccess: () => {
+                          alert("Tag berhasil dihapus.");
+                        },
+                        onError: (error) => {
+                          const message =
+                            error instanceof Error
+                              ? error.message
+                              : "Gagal menghapus tag.";
+                          alert(message);
+                        },
+                      });
                     }
                   }}
                 >

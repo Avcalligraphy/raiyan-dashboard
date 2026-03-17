@@ -58,6 +58,12 @@
     block-size: auto;
   }
 
+  a {
+    color: var(--mui-palette-primary-main);
+    text-decoration: underline;
+    text-underline-offset: 0.12em;
+  }
+
   blockquote {
     padding-inline-start: 1rem;
     border-inline-start: 2px solid var(--mui-palette-divider);

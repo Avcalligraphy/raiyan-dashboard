@@ -23,11 +23,12 @@ const BlogPostEditPage = () => {
   const [form, setForm] = useState<BlogPostFormState>(initialBlogPostFormState);
 
   const { data: post, isLoading: loadingPost, error: postError } = useBlogPost(id ?? null);
-  const { data: postTags = [] } = useBlogPostTags(id ?? null);
+  const { data: postTags } = useBlogPostTags(id ?? null);
   const updatePost = useUpdateBlogPost();
 
   useEffect(() => {
     if (!post) return;
+    const tags = postTags ?? [];
     setForm({
       title: post.title ?? "",
       slug: post.slug ?? "",
@@ -40,7 +41,7 @@ const BlogPostEditPage = () => {
       scheduled_at: post.scheduled_at
         ? new Date(post.scheduled_at).toISOString().slice(0, 16)
         : "",
-      tag_ids: postTags.map((t) => t.id),
+      tag_ids: tags.map((t) => t.id),
     });
   }, [post, postTags]);
 

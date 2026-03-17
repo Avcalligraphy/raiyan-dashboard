@@ -54,11 +54,11 @@ const horizontalMenuData = (): HorizontalMenuDataType[] => [
     href: "/testimonials",
     icon: "ri-star-line",
   },
-  {
-    label: "Site Galleries",
-    href: "/site-galleries",
-    icon: "ri-image-line",
-  },
+  // {
+  //   label: "Site Galleries",
+  //   href: "/site-galleries",
+  //   icon: "ri-image-line",
+  // },
   {
     label: "Legal Document",
     href: "/legal-document",
